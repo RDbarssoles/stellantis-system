@@ -1,0 +1,61 @@
+.flow-container {
+  animation: fadeIn 0.4s ease-in;
+}
+
+.flow-header {
+  background: var(--surface-color);
+  padding: 25px;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 20px;
+}
+
+.back-button {
+  background: transparent;
+  color: var(--primary-color);
+  border: none;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 15px;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.back-button:hover {
+  color: var(--primary-dark);
+  transform: translateX(-5px);
+}
+
+.flow-header h2 {
+  font-size: 28px;
+  color: var(--text-color);
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+.flow-description {
+  font-size: 14px;
+  color: var(--text-light);
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .flow-header {
+    padding: 20px;
+  }
+
+  .flow-header h2 {
+    font-size: 22px;
+  }
+
+  .flow-description {
+    font-size: 13px;
+  }
+}
+
+
+
+

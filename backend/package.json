@@ -1,0 +1,22 @@
+{
+  "name": "pd-smartdoc-backend",
+  "version": "1.0.0",
+  "description": "Backend API for PD-SmartDoc - Engineering Document Management",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": ["engineering", "EDPS", "DVP", "DFMEA", "automotive"],
+  "author": "Stefanini",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "uuid": "^9.0.1",
+    "exceljs": "^4.4.0",
+    "pdfkit": "^0.13.0"
+  }
+}
+
