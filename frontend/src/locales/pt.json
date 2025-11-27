@@ -53,6 +53,17 @@
       "OTHER": "Outro"
     }
   },
+  "login": {
+    "subtitle": "Assistente de Gerenciamento de Documentos de Engenharia",
+    "username": "Usuário",
+    "password": "Senha",
+    "usernamePlaceholder": "Digite seu usuário",
+    "passwordPlaceholder": "Digite sua senha",
+    "loginButton": "Entrar",
+    "loggingIn": "Entrando...",
+    "error": "Usuário ou senha inválidos. Por favor, tente novamente.",
+    "footer": "© 2025 Stellantis - PD-SmartDoc. Todos os direitos reservados."
+  },
   "home": {
     "welcome": "Bem-vindo ao PD-SmartDoc",
     "subtitle": "Seu assistente conversacional para gerenciamento de documentos de engenharia. Selecione um módulo abaixo para começar.",

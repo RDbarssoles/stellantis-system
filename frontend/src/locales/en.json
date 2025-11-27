@@ -53,6 +53,17 @@
       "OTHER": "Other"
     }
   },
+  "login": {
+    "subtitle": "Engineering Document Management Assistant",
+    "username": "Username",
+    "password": "Password",
+    "usernamePlaceholder": "Enter your username",
+    "passwordPlaceholder": "Enter your password",
+    "loginButton": "Sign In",
+    "loggingIn": "Signing in...",
+    "error": "Invalid username or password. Please try again.",
+    "footer": "© 2025 Stellantis - PD-SmartDoc. All rights reserved."
+  },
   "home": {
     "welcome": "Welcome to PD-SmartDoc",
     "subtitle": "Your conversational assistant for engineering document management. Select a module below to get started.",

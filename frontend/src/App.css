@@ -12,12 +12,14 @@
   position: sticky;
   top: 0;
   z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 30px;
 }
 
 .header-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
+  flex: 1;
 }
 
 .app-header h1 {
@@ -33,6 +35,38 @@
   font-weight: 400;
 }
 
+.logout-button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.logout-button:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.user-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.logout-icon {
+  font-size: 18px;
+}
+
 .app-main {
   flex: 1;
   max-width: 1200px;
@@ -42,12 +76,25 @@
 }
 
 @media (max-width: 768px) {
+  .app-header {
+    padding: 15px 20px;
+  }
+
   .app-header h1 {
     font-size: 24px;
   }
   
   .header-subtitle {
     font-size: 12px;
+  }
+
+  .logout-button {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  .user-name {
+    display: none;
   }
   
   .app-main {
