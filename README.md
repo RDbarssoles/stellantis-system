@@ -66,6 +66,7 @@ npm install
 
 **Prerequisites:** Docker and Docker Compose installed
 
+**With JSON file storage (current default):**
 ```bash
 # Build and start all services
 docker-compose up -d
@@ -81,7 +82,25 @@ docker-compose logs -f
 docker-compose down
 ```
 
-For detailed Docker instructions, see [README.Docker.md](README.Docker.md)
+**With PostgreSQL database:**
+```bash
+# Use the database-enabled compose file
+docker-compose -f docker-compose.db.yml up -d
+
+# View logs
+docker-compose -f docker-compose.db.yml logs -f
+
+# Access the application
+# Frontend: http://localhost
+# Backend API: http://localhost:3001
+# Database: localhost:5432
+
+# Stop services
+docker-compose -f docker-compose.db.yml down
+```
+
+For detailed Docker instructions, see [README.Docker.md](README.Docker.md)  
+For database migration guide, see [DATABASE_MIGRATION_GUIDE.md](DATABASE_MIGRATION_GUIDE.md)
 
 ### Option 2: Run Backend and Frontend Separately (Development)
 

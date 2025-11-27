@@ -1,0 +1,88 @@
+# Docker Compose with PostgreSQL Database
+# Usage: docker-compose -f docker-compose.db.yml up -d
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: pd-smartdoc-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: pdsmartdoc
+      POSTGRES_USER: pduser
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-pdpassword123}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --lc-collate=en_US.UTF-8 --lc-ctype=en_US.UTF-8"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d  # SQL initialization scripts
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pduser -d pdsmartdoc"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend Service (updated to use database)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: pd-smartdoc-backend
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - DATABASE_URL=postgresql://pduser:${DB_PASSWORD:-pdpassword123}@postgres:5432/pdsmartdoc
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=pdsmartdoc
+      - DB_USER=pduser
+      - DB_PASSWORD=${DB_PASSWORD:-pdpassword123}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/api/health', (r) => { process.exit(r.statusCode === 200 ? 0 : 1) })"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Frontend Service
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: pd-smartdoc-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    environment:
+      - VITE_API_URL=http://localhost:3001/api
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+    driver: local
+
