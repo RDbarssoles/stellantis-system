@@ -16,6 +16,7 @@ export interface EDPS {
   title: string
   description: string
   target: string
+  carPart: string
   images: string[]
   createdAt: string
   updatedAt: string
@@ -27,6 +28,7 @@ export interface CreateEDPSData {
   title: string
   description?: string
   target?: string
+  carPart?: string
   images?: string[]
 }
 
@@ -48,6 +50,7 @@ export interface DVP {
   acceptanceCriteria: string
   responsible: string
   parameterRange: string
+  carPart: string
   createdAt: string
   updatedAt: string
   status: string
@@ -61,6 +64,7 @@ export interface CreateDVPData {
   acceptanceCriteria?: string
   responsible?: string
   parameterRange?: string
+  carPart?: string
 }
 
 export const dvpAPI = {
@@ -77,6 +81,7 @@ export interface DFMEA {
   genericFailure: string
   failureMode: string
   cause: string
+  carPart: string
   preventionControl: {
     type: string
     edpsId: string
@@ -102,6 +107,7 @@ export interface CreateDFMEAData {
   genericFailure: string
   failureMode: string
   cause?: string
+  carPart?: string
   preventionControl?: {
     type: string
     edpsId: string

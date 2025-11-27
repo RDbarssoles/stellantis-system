@@ -36,7 +36,7 @@ dvpRouter.get('/:id', async (req, res, next) => {
 /**
  * POST /api/dvp
  * Create a new DVP test procedure
- * Body: { procedureId, procedureType, performanceObjective, testName, acceptanceCriteria, responsible, parameterRange }
+ * Body: { procedureId, procedureType, performanceObjective, testName, acceptanceCriteria, responsible, parameterRange, carPart }
  */
 dvpRouter.post('/', async (req, res, next) => {
   try {
@@ -47,7 +47,8 @@ dvpRouter.post('/', async (req, res, next) => {
       testName, 
       acceptanceCriteria, 
       responsible, 
-      parameterRange 
+      parameterRange,
+      carPart
     } = req.body;
 
     // Basic validation
@@ -67,6 +68,7 @@ dvpRouter.post('/', async (req, res, next) => {
       acceptanceCriteria: acceptanceCriteria || '',
       responsible: responsible || '',
       parameterRange: parameterRange || '',
+      carPart: carPart || '',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       status: 'active'
@@ -93,6 +95,7 @@ dvpRouter.put('/:id', async (req, res, next) => {
       acceptanceCriteria, 
       responsible, 
       parameterRange,
+      carPart,
       status 
     } = req.body;
     
@@ -104,6 +107,7 @@ dvpRouter.put('/:id', async (req, res, next) => {
     if (acceptanceCriteria !== undefined) updates.acceptanceCriteria = acceptanceCriteria;
     if (responsible !== undefined) updates.responsible = responsible;
     if (parameterRange !== undefined) updates.parameterRange = parameterRange;
+    if (carPart !== undefined) updates.carPart = carPart;
     if (status !== undefined) updates.status = status;
 
     const updatedProcedure = await dvpStorage.update(req.params.id, updates);

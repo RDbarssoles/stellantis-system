@@ -11,21 +11,31 @@ export type Page = 'home' | 'edps' | 'dvp' | 'dfmea' | 'search'
 
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home')
+  const [searchCarPart, setSearchCarPart] = useState<string | undefined>()
+
+  const handleNavigate = (page: Page, carPart?: string) => {
+    setCurrentPage(page)
+    if (page === 'search' && carPart) {
+      setSearchCarPart(carPart)
+    } else {
+      setSearchCarPart(undefined)
+    }
+  }
 
   const renderPage = () => {
     switch (currentPage) {
       case 'home':
-        return <Home onNavigate={setCurrentPage} />
+        return <Home onNavigate={handleNavigate} />
       case 'edps':
-        return <EDPSFlow onBack={() => setCurrentPage('home')} />
+        return <EDPSFlow onBack={() => handleNavigate('home')} />
       case 'dvp':
-        return <DVPFlow onBack={() => setCurrentPage('home')} />
+        return <DVPFlow onBack={() => handleNavigate('home')} />
       case 'dfmea':
-        return <DFMEAFlow onBack={() => setCurrentPage('home')} />
+        return <DFMEAFlow onBack={() => handleNavigate('home')} />
       case 'search':
-        return <Search onBack={() => setCurrentPage('home')} />
+        return <Search onBack={() => handleNavigate('home')} initialCarPart={searchCarPart} />
       default:
-        return <Home onNavigate={setCurrentPage} />
+        return <Home onNavigate={handleNavigate} />
     }
   }
 

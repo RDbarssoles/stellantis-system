@@ -25,6 +25,7 @@ function EDPSFlow({ onBack }: EDPSFlowProps) {
     title: '',
     description: '',
     target: '',
+    carPart: '',
     images: []
   })
 
@@ -83,9 +84,17 @@ function EDPSFlow({ onBack }: EDPSFlowProps) {
           setStep('aiInput')
         } else if (userInput.toLowerCase().includes('create') || userInput.toLowerCase().includes('new') || userInput.toLowerCase().includes('criar')) {
           const suggestedNumber = Math.floor(10000 + Math.random() * 90000).toString()
-          setFormData(prev => ({ ...prev, normNumber: suggestedNumber }))
-          addAssistantMessage(`Great! Let's create a new EDPS norm. I suggest the norm number: ${suggestedNumber}. Please provide a title for this norm.`)
-          setStep('title')
+          setFormData(prev => ({ 
+            ...prev, 
+            normNumber: suggestedNumber,
+            title: '',
+            description: '',
+            target: '',
+            carPart: '',
+            images: []
+          }))
+          // Go directly to review screen with blank fields
+          setStep('review')
         } else if (userInput.toLowerCase().includes('view') || userInput.toLowerCase().includes('existing') || userInput.toLowerCase().includes('ver')) {
           addAssistantMessage('Fetching existing norms...')
           fetchExistingNorms()
@@ -148,6 +157,9 @@ function EDPSFlow({ onBack }: EDPSFlowProps) {
         if (userInput.toLowerCase().includes('another') || userInput.toLowerCase().includes('outro') || 
             userInput.toLowerCase().includes('create') || userInput.toLowerCase().includes('criar')) {
           resetForm()
+        } else if (userInput.toLowerCase().includes('back') || userInput.toLowerCase().includes('home') || 
+                   userInput.toLowerCase().includes('voltar') || userInput.toLowerCase().includes('início')) {
+          onBack()
         } else {
           onBack()
         }
@@ -175,8 +187,8 @@ function EDPSFlow({ onBack }: EDPSFlowProps) {
   }
 
   const handleEditFromReview = () => {
-    setStep('title')
-    addAssistantMessage('Let\'s edit the norm. Please provide a new title or continue with the existing information.')
+    // Go back to home
+    onBack()
   }
 
   const fetchExistingNorms = async () => {
@@ -273,16 +285,16 @@ function EDPSFlow({ onBack }: EDPSFlowProps) {
   }
 
   const resetForm = () => {
+    const suggestedNumber = Math.floor(10000 + Math.random() * 90000).toString()
     setFormData({
-      normNumber: '',
+      normNumber: suggestedNumber,
       title: '',
       description: '',
       target: '',
+      carPart: '',
       images: []
     })
-    setStep('initial')
-    addAssistantMessage('Let\'s create another norm! What would you like to do?')
-    setQuickReplies(['Create new norm', 'Use AI Tool 🤖', 'View existing norms'])
+    setStep('review')
   }
 
   const handleFieldChange = (fieldName: string, value: string | number) => {
@@ -292,10 +304,36 @@ function EDPSFlow({ onBack }: EDPSFlowProps) {
     }))
   }
 
+  const handleImagesChange = (_fieldName: string, value: string[]) => {
+    setFormData(prev => ({
+      ...prev,
+      images: value
+    }))
+  }
+
   if (step === 'review') {
     const warningMessage = !formData.normNumber || !formData.title 
       ? 'Você precisa preencher todos os campos em Dados Básicos antes de salvar.'
       : undefined
+
+    // Car parts options
+    const carPartOptions = [
+      { value: 'WHEEL_ASSEMBLY', label: t('common.carParts.WHEEL_ASSEMBLY') },
+      { value: 'ENGINE', label: t('common.carParts.ENGINE') },
+      { value: 'BRAKE_SYSTEM', label: t('common.carParts.BRAKE_SYSTEM') },
+      { value: 'STEERING_SYSTEM', label: t('common.carParts.STEERING_SYSTEM') },
+      { value: 'EXHAUST_SYSTEM', label: t('common.carParts.EXHAUST_SYSTEM') },
+      { value: 'TRANSMISSION', label: t('common.carParts.TRANSMISSION') },
+      { value: 'SUSPENSION', label: t('common.carParts.SUSPENSION') },
+      { value: 'ELECTRICAL_SYSTEM', label: t('common.carParts.ELECTRICAL_SYSTEM') },
+      { value: 'COOLING_SYSTEM', label: t('common.carParts.COOLING_SYSTEM') },
+      { value: 'FUEL_SYSTEM', label: t('common.carParts.FUEL_SYSTEM') },
+      { value: 'BODY_EXTERIOR', label: t('common.carParts.BODY_EXTERIOR') },
+      { value: 'BODY_INTERIOR', label: t('common.carParts.BODY_INTERIOR') },
+      { value: 'HVAC_SYSTEM', label: t('common.carParts.HVAC_SYSTEM') },
+      { value: 'SAFETY_SYSTEMS', label: t('common.carParts.SAFETY_SYSTEMS') },
+      { value: 'OTHER', label: t('common.carParts.OTHER') }
+    ]
 
     return (
       <SummaryReview
@@ -306,10 +344,17 @@ function EDPSFlow({ onBack }: EDPSFlowProps) {
             title: t('edps.summary.sectionBasicData'),
             fields: [
               { label: t('edps.fields.normNumber'), value: formData.normNumber, fieldName: 'normNumber', placeholder: 'Ex: NP-2024-001' },
-              { label: 'Criado por', value: 'System', fieldName: 'creator', placeholder: 'Nome do criador' },
+              { label: t('common.createdBy'), value: 'System', fieldName: 'creator', placeholder: 'Nome do criador', readonly: true },
+              { label: t('edps.fields.carPart'), value: formData.carPart, fieldName: 'carPart', type: 'select', options: carPartOptions, placeholder: t('edps.fields.carPart') },
               { label: t('edps.fields.title'), value: formData.title, fullWidth: true, fieldName: 'title', placeholder: t('edps.fields.title'), type: 'text' },
               { label: t('edps.fields.description'), value: formData.description, fullWidth: true, fieldName: 'description', placeholder: t('edps.fields.description'), type: 'textarea' },
               { label: t('edps.fields.target'), value: formData.target, fullWidth: true, fieldName: 'target', placeholder: t('edps.fields.target'), type: 'textarea' }
+            ]
+          },
+          {
+            title: t('edps.summary.sectionImages'),
+            fields: [
+              { label: t('edps.fields.images'), value: formData.images, fullWidth: true, fieldName: 'images', type: 'image-upload' }
             ]
           }
         ]}
@@ -321,7 +366,13 @@ function EDPSFlow({ onBack }: EDPSFlowProps) {
         statusBadge={{ label: t('common.draft'), type: 'draft' }}
         onSave={handleSaveFromReview}
         onEdit={handleEditFromReview}
-        onFieldChange={handleFieldChange}
+        onFieldChange={(fieldName, value) => {
+          if (fieldName === 'images') {
+            handleImagesChange(fieldName, value as string[])
+          } else {
+            handleFieldChange(fieldName, value as string | number)
+          }
+        }}
         isSaving={isSaving}
         warningMessage={warningMessage}
       />

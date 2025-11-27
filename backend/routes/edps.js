@@ -36,11 +36,11 @@ edpsRouter.get('/:id', async (req, res, next) => {
 /**
  * POST /api/edps
  * Create a new EDPS norm
- * Body: { normNumber, title, description, target, images }
+ * Body: { normNumber, title, description, target, carPart, images }
  */
 edpsRouter.post('/', async (req, res, next) => {
   try {
-    const { normNumber, title, description, target, images } = req.body;
+    const { normNumber, title, description, target, carPart, images } = req.body;
 
     // Basic validation
     if (!normNumber || !title) {
@@ -56,6 +56,7 @@ edpsRouter.post('/', async (req, res, next) => {
       title,
       description: description || '',
       target: target || '',
+      carPart: carPart || '',
       images: images || [],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -75,13 +76,14 @@ edpsRouter.post('/', async (req, res, next) => {
  */
 edpsRouter.put('/:id', async (req, res, next) => {
   try {
-    const { normNumber, title, description, target, images, status } = req.body;
+    const { normNumber, title, description, target, carPart, images, status } = req.body;
     
     const updates = {};
     if (normNumber !== undefined) updates.normNumber = normNumber;
     if (title !== undefined) updates.title = title;
     if (description !== undefined) updates.description = description;
     if (target !== undefined) updates.target = target;
+    if (carPart !== undefined) updates.carPart = carPart;
     if (images !== undefined) updates.images = images;
     if (status !== undefined) updates.status = status;
 

@@ -5,6 +5,7 @@ import './Search.css'
 
 interface SearchProps {
   onBack: () => void
+  initialCarPart?: string
 }
 
 type DocumentType = 'all' | 'edps' | 'dvp' | 'dfmea'
@@ -22,10 +23,11 @@ interface SearchResult {
   data: EDPS | DVP | DFMEA
 }
 
-function Search({ onBack }: SearchProps) {
+function Search({ onBack, initialCarPart }: SearchProps) {
   const { t } = useLanguage()
   const [searchQuery, setSearchQuery] = useState('')
   const [filter, setFilter] = useState<DocumentType>('all')
+  const [carPartFilter, setCarPartFilter] = useState<string>(initialCarPart || '')
   const [results, setResults] = useState<SearchResult[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [counts, setCounts] = useState({ edps: 0, dvp: 0, dfmea: 0 })
@@ -33,6 +35,12 @@ function Search({ onBack }: SearchProps) {
   useEffect(() => {
     loadAllDocuments()
   }, [])
+
+  useEffect(() => {
+    if (initialCarPart) {
+      setCarPartFilter(initialCarPart)
+    }
+  }, [initialCarPart])
 
   const loadAllDocuments = async () => {
     setIsLoading(true)
@@ -104,7 +112,11 @@ function Search({ onBack }: SearchProps) {
     
     const matchesFilter = filter === 'all' || result.type === filter
 
-    return matchesSearch && matchesFilter
+    // Check car part filter
+    const matchesCarPart = carPartFilter === '' || 
+      (result.data as any).carPart === carPartFilter
+
+    return matchesSearch && matchesFilter && matchesCarPart
   })
 
   const getTypeIcon = (type: string) => {
@@ -175,6 +187,31 @@ function Search({ onBack }: SearchProps) {
             <option value="edps">{t('search.filters.edps')}</option>
             <option value="dvp">{t('search.filters.dvp')}</option>
             <option value="dfmea">{t('search.filters.dfmea')}</option>
+          </select>
+        </div>
+
+        <div className="filter-dropdown">
+          <select 
+            value={carPartFilter} 
+            onChange={(e) => setCarPartFilter(e.target.value)}
+            className="filter-select"
+          >
+            <option value="">{t('search.filters.allCarParts')}</option>
+            <option value="WHEEL_ASSEMBLY">{t('common.carParts.WHEEL_ASSEMBLY')}</option>
+            <option value="ENGINE">{t('common.carParts.ENGINE')}</option>
+            <option value="BRAKE_SYSTEM">{t('common.carParts.BRAKE_SYSTEM')}</option>
+            <option value="STEERING_SYSTEM">{t('common.carParts.STEERING_SYSTEM')}</option>
+            <option value="EXHAUST_SYSTEM">{t('common.carParts.EXHAUST_SYSTEM')}</option>
+            <option value="TRANSMISSION">{t('common.carParts.TRANSMISSION')}</option>
+            <option value="SUSPENSION">{t('common.carParts.SUSPENSION')}</option>
+            <option value="ELECTRICAL_SYSTEM">{t('common.carParts.ELECTRICAL_SYSTEM')}</option>
+            <option value="COOLING_SYSTEM">{t('common.carParts.COOLING_SYSTEM')}</option>
+            <option value="FUEL_SYSTEM">{t('common.carParts.FUEL_SYSTEM')}</option>
+            <option value="BODY_EXTERIOR">{t('common.carParts.BODY_EXTERIOR')}</option>
+            <option value="BODY_INTERIOR">{t('common.carParts.BODY_INTERIOR')}</option>
+            <option value="HVAC_SYSTEM">{t('common.carParts.HVAC_SYSTEM')}</option>
+            <option value="SAFETY_SYSTEMS">{t('common.carParts.SAFETY_SYSTEMS')}</option>
+            <option value="OTHER">{t('common.carParts.OTHER')}</option>
           </select>
         </div>
       </div>

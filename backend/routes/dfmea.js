@@ -58,7 +58,8 @@ dfmeaRouter.post('/', async (req, res, next) => {
     const { 
       genericFailure, 
       failureMode, 
-      cause, 
+      cause,
+      carPart,
       preventionControl,
       detectionControl,
       severity,
@@ -101,6 +102,7 @@ dfmeaRouter.post('/', async (req, res, next) => {
       genericFailure,
       failureMode,
       cause: cause || '',
+      carPart: carPart || '',
       preventionControl: preventionControl || null,
       detectionControl: detectionControl || null,
       severity: severity || null,
@@ -128,7 +130,8 @@ dfmeaRouter.put('/:id', async (req, res, next) => {
     const { 
       genericFailure, 
       failureMode, 
-      cause, 
+      cause,
+      carPart,
       preventionControl,
       detectionControl,
       severity,
@@ -141,6 +144,7 @@ dfmeaRouter.put('/:id', async (req, res, next) => {
     if (genericFailure !== undefined) updates.genericFailure = genericFailure;
     if (failureMode !== undefined) updates.failureMode = failureMode;
     if (cause !== undefined) updates.cause = cause;
+    if (carPart !== undefined) updates.carPart = carPart;
     if (preventionControl !== undefined) updates.preventionControl = preventionControl;
     if (detectionControl !== undefined) updates.detectionControl = detectionControl;
     if (severity !== undefined) updates.severity = severity;

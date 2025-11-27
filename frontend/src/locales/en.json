@@ -33,7 +33,25 @@
     "downloadingExcel": "Downloading Excel file...",
     "downloadingPDF": "Downloading PDF file...",
     "createAnother": "Create another",
-    "goBackToHome": "Go back to home"
+    "goBackToHome": "Go back to home",
+    "createdBy": "Created by",
+    "carParts": {
+      "WHEEL_ASSEMBLY": "Wheel Assembly",
+      "ENGINE": "Engine",
+      "BRAKE_SYSTEM": "Brake System",
+      "STEERING_SYSTEM": "Steering System",
+      "EXHAUST_SYSTEM": "Exhaust System",
+      "TRANSMISSION": "Transmission",
+      "SUSPENSION": "Suspension",
+      "ELECTRICAL_SYSTEM": "Electrical System",
+      "COOLING_SYSTEM": "Cooling System",
+      "FUEL_SYSTEM": "Fuel System",
+      "BODY_EXTERIOR": "Body Exterior",
+      "BODY_INTERIOR": "Body Interior",
+      "HVAC_SYSTEM": "HVAC System",
+      "SAFETY_SYSTEMS": "Safety Systems",
+      "OTHER": "Other"
+    }
   },
   "home": {
     "welcome": "Welcome to PD-SmartDoc",
@@ -41,6 +59,10 @@
     "searchAction": {
       "title": "Search & Browse Documents",
       "description": "View all EDPS, DVP&R, and DFMEA documents in one place"
+    },
+    "carPartsFilter": {
+      "title": "Filter by Car Part",
+      "subtitle": "Select a car part to see all related documents"
     },
     "modules": {
       "edps": {
@@ -70,8 +92,24 @@
         "description": "Create DVP test procedures with acceptance criteria"
       },
       "step3": {
-        "title": "Link in DFMEA",
+        "title": "Add failure mode",
         "description": "Connect norms and tests to failure modes for complete traceability"
+      }
+    },
+    "helpBot": {
+      "buttonText": "How can I help you?",
+      "greeting": "Hello! I'm your PD-SmartDoc assistant. How can I help you today?",
+      "placeholder": "Type your question here...",
+      "quickActions": {
+        "createNorm": "Create a new EDPS norm",
+        "createTest": "Create a new DVP test",
+        "createDFMEA": "Create a new DFMEA",
+        "search": "Search documents",
+        "help": "Show me how to use the system"
+      },
+      "responses": {
+        "help": "PD-SmartDoc helps you manage engineering documents. You can:\n\n• Create EDPS norms (standards and procedures)\n• Define DVP tests (validation procedures)\n• Analyze failures with DFMEA\n• Link everything for complete traceability\n\nWhat would you like to do?",
+        "default": "I can help you navigate the system. Would you like to create a document or search existing ones?"
       }
     }
   },
@@ -94,6 +132,7 @@
       "title": "Title",
       "description": "Description",
       "target": "Target/Objective",
+      "carPart": "Car Part",
       "images": "Images"
     },
     "summary": {
@@ -134,7 +173,8 @@
       "objective": "Objective",
       "acceptanceCriteria": "Acceptance Criteria",
       "responsible": "Responsible",
-      "parameterRange": "Parameter Range"
+      "parameterRange": "Parameter Range",
+      "carPart": "Car Part"
     },
     "summary": {
       "title": "New Test",
@@ -170,6 +210,7 @@
       "genericFailure": "Generic Failure",
       "failureMode": "Failure Mode",
       "cause": "Cause/Effect",
+      "carPart": "Car Part",
       "severity": "Severity",
       "occurrence": "Occurrence",
       "detection": "Detection",
@@ -203,7 +244,8 @@
       "all": "All",
       "edps": "EDPS",
       "dvp": "DVP&R",
-      "dfmea": "DFMEA"
+      "dfmea": "DFMEA",
+      "allCarParts": "All Car Parts"
     },
     "results": "Results",
     "noResults": {
@@ -221,6 +263,7 @@
     "save": "💾 Save",
     "warningTitle": "Required fields not filled",
     "status": "Status",
+    "uploadImages": "Upload Images",
     "metrics": {
       "relatedTests": "Related Tests",
       "norms": "Norms",

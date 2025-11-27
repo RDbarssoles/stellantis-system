@@ -1,6 +1,25 @@
 -- PD-SmartDoc Database Schema
 -- PostgreSQL initialization script
 
+-- Create ENUM type for car parts
+CREATE TYPE car_part_enum AS ENUM (
+    'WHEEL_ASSEMBLY',
+    'ENGINE',
+    'BRAKE_SYSTEM',
+    'STEERING_SYSTEM',
+    'EXHAUST_SYSTEM',
+    'TRANSMISSION',
+    'SUSPENSION',
+    'ELECTRICAL_SYSTEM',
+    'COOLING_SYSTEM',
+    'FUEL_SYSTEM',
+    'BODY_EXTERIOR',
+    'BODY_INTERIOR',
+    'HVAC_SYSTEM',
+    'SAFETY_SYSTEMS',
+    'OTHER'
+);
+
 -- Create EDPS table (Engineering Design Practices)
 CREATE TABLE IF NOT EXISTS edps (
     id VARCHAR(36) PRIMARY KEY,
@@ -8,6 +27,7 @@ CREATE TABLE IF NOT EXISTS edps (
     title VARCHAR(255) NOT NULL,
     description TEXT,
     target TEXT,
+    car_part car_part_enum, -- Part of the car this norm is responsible for
     images TEXT[], -- Array of image URLs
     status VARCHAR(50) DEFAULT 'draft',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -24,6 +44,7 @@ CREATE TABLE IF NOT EXISTS dvp (
     acceptance_criteria TEXT,
     responsible VARCHAR(100),
     parameter_range VARCHAR(100),
+    car_part car_part_enum, -- Part of the car this test is responsible for
     status VARCHAR(50) DEFAULT 'draft',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -35,6 +56,7 @@ CREATE TABLE IF NOT EXISTS dfmea (
     generic_failure VARCHAR(255) NOT NULL,
     failure_mode TEXT NOT NULL,
     cause TEXT,
+    car_part car_part_enum, -- Part of the car this failure analysis is responsible for
     prevention_control JSONB, -- Store as JSON object with type, edpsId, description
     detection_control JSONB,  -- Store as JSON object with type, dvpId, description
     severity INTEGER CHECK (severity >= 1 AND severity <= 10),

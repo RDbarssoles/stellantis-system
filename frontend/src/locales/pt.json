@@ -33,7 +33,25 @@
     "downloadingExcel": "Baixando arquivo Excel...",
     "downloadingPDF": "Baixando arquivo PDF...",
     "createAnother": "Criar outro",
-    "goBackToHome": "Voltar para início"
+    "goBackToHome": "Voltar para início",
+    "createdBy": "Criado por",
+    "carParts": {
+      "WHEEL_ASSEMBLY": "Conjunto de Rodas",
+      "ENGINE": "Motor",
+      "BRAKE_SYSTEM": "Sistema de Freios",
+      "STEERING_SYSTEM": "Sistema de Direção",
+      "EXHAUST_SYSTEM": "Sistema de Escape",
+      "TRANSMISSION": "Transmissão",
+      "SUSPENSION": "Suspensão",
+      "ELECTRICAL_SYSTEM": "Sistema Elétrico",
+      "COOLING_SYSTEM": "Sistema de Refrigeração",
+      "FUEL_SYSTEM": "Sistema de Combustível",
+      "BODY_EXTERIOR": "Carroceria Externa",
+      "BODY_INTERIOR": "Interior",
+      "HVAC_SYSTEM": "Sistema de Climatização",
+      "SAFETY_SYSTEMS": "Sistemas de Segurança",
+      "OTHER": "Outro"
+    }
   },
   "home": {
     "welcome": "Bem-vindo ao PD-SmartDoc",
@@ -41,6 +59,10 @@
     "searchAction": {
       "title": "Buscar e Navegar Documentos",
       "description": "Visualize todos os documentos EDPS, DVP&R e DFMEA em um só lugar"
+    },
+    "carPartsFilter": {
+      "title": "Filtrar por Peça do Carro",
+      "subtitle": "Selecione uma peça para ver todos os documentos relacionados"
     },
     "modules": {
       "edps": {
@@ -70,8 +92,24 @@
         "description": "Crie procedimentos de teste DVP com critérios de aceitação"
       },
       "step3": {
-        "title": "Vincular no DFMEA",
+        "title": "Adicionar modo de falha",
         "description": "Conecte normas e testes aos modos de falha para rastreabilidade completa"
+      }
+    },
+    "helpBot": {
+      "buttonText": "Como posso ajudar?",
+      "greeting": "Olá! Sou seu assistente PD-SmartDoc. Como posso ajudá-lo hoje?",
+      "placeholder": "Digite sua pergunta aqui...",
+      "quickActions": {
+        "createNorm": "Criar uma nova norma EDPS",
+        "createTest": "Criar um novo teste DVP",
+        "createDFMEA": "Criar um novo DFMEA",
+        "search": "Buscar documentos",
+        "help": "Mostrar como usar o sistema"
+      },
+      "responses": {
+        "help": "O PD-SmartDoc ajuda você a gerenciar documentos de engenharia. Você pode:\n\n• Criar normas EDPS (padrões e procedimentos)\n• Definir testes DVP (procedimentos de validação)\n• Analisar falhas com DFMEA\n• Vincular tudo para rastreabilidade completa\n\nO que você gostaria de fazer?",
+        "default": "Posso ajudá-lo a navegar no sistema. Você gostaria de criar um documento ou buscar os existentes?"
       }
     }
   },
@@ -94,6 +132,7 @@
       "title": "Título",
       "description": "Descrição",
       "target": "Alvo/Objetivo",
+      "carPart": "Peça do Carro",
       "images": "Imagens"
     },
     "summary": {
@@ -134,7 +173,8 @@
       "objective": "Objetivo",
       "acceptanceCriteria": "Critérios de Aceitação",
       "responsible": "Responsável",
-      "parameterRange": "Faixa de Parâmetros"
+      "parameterRange": "Faixa de Parâmetros",
+      "carPart": "Peça do Carro"
     },
     "summary": {
       "title": "Novo Teste",
@@ -170,6 +210,7 @@
       "genericFailure": "Falha Genérica",
       "failureMode": "Modo de Falha",
       "cause": "Causa/Efeito",
+      "carPart": "Peça do Carro",
       "severity": "Severidade",
       "occurrence": "Ocorrência",
       "detection": "Detecção",
@@ -203,7 +244,8 @@
       "all": "Todas",
       "edps": "EDPS",
       "dvp": "DVP&R",
-      "dfmea": "DFMEA"
+      "dfmea": "DFMEA",
+      "allCarParts": "Todas as Peças"
     },
     "results": "Resultados",
     "noResults": {
@@ -221,6 +263,7 @@
     "save": "💾 Salvar",
     "warningTitle": "Campos obrigatórios não preenchidos",
     "status": "Status",
+    "uploadImages": "Carregar Imagens",
     "metrics": {
       "relatedTests": "Testes Relacionados",
       "norms": "Normas",

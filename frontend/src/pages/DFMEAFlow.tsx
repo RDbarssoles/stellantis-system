@@ -27,6 +27,7 @@ function DFMEAFlow({ onBack }: DFMEAFlowProps) {
     genericFailure: '',
     failureMode: '',
     cause: '',
+    carPart: '',
     severity: 5,
     occurrence: 5,
     detection: 5
@@ -86,8 +87,17 @@ function DFMEAFlow({ onBack }: DFMEAFlowProps) {
           addAssistantMessage(t('dfmea.aiPrompt'))
           setStep('aiInput')
         } else if (userInput.toLowerCase().includes('create') || userInput.toLowerCase().includes('new') || userInput.toLowerCase().includes('criar')) {
-          addAssistantMessage('Great! Let\'s create a new DFMEA entry. Please describe the generic failure or system.')
-          setStep('genericFailure')
+          setFormData({
+            genericFailure: '',
+            failureMode: '',
+            cause: '',
+            carPart: '',
+            severity: 5,
+            occurrence: 5,
+            detection: 5
+          })
+          // Go directly to review screen with blank fields
+          setStep('review')
         } else if (userInput.toLowerCase().includes('view') || userInput.toLowerCase().includes('existing') || userInput.toLowerCase().includes('ver')) {
           addAssistantMessage('Fetching existing DFMEA entries...')
           await fetchExistingDFMEA()
@@ -320,8 +330,8 @@ function DFMEAFlow({ onBack }: DFMEAFlowProps) {
   }
 
   const handleEditFromReview = () => {
-    setStep('genericFailure')
-    addAssistantMessage('Let\'s edit the DFMEA. Please describe the generic failure or system.')
+    // Go back to home
+    onBack()
   }
 
   const fetchExistingDFMEA = async () => {
@@ -449,16 +459,15 @@ function DFMEAFlow({ onBack }: DFMEAFlowProps) {
       genericFailure: '',
       failureMode: '',
       cause: '',
+      carPart: '',
       severity: 5,
       occurrence: 5,
       detection: 5
     })
-    setStep('initial')
-    addAssistantMessage('Let\'s create another DFMEA entry! What would you like to do?')
-    setQuickReplies(['Create new DFMEA', 'Use AI Tool 🤖', 'View existing DFMEAs'])
+    setStep('review')
   }
 
-  const handleFieldChange = (fieldName: string, value: string | number) => {
+  const handleFieldChange = (fieldName: string, value: string | number | string[]) => {
     setFormData(prev => ({
       ...prev,
       [fieldName]: value
@@ -472,6 +481,25 @@ function DFMEAFlow({ onBack }: DFMEAFlowProps) {
 
     const rpn = (formData.severity || 0) * (formData.occurrence || 0) * (formData.detection || 0)
 
+    // Car parts options
+    const carPartOptions = [
+      { value: 'WHEEL_ASSEMBLY', label: t('common.carParts.WHEEL_ASSEMBLY') },
+      { value: 'ENGINE', label: t('common.carParts.ENGINE') },
+      { value: 'BRAKE_SYSTEM', label: t('common.carParts.BRAKE_SYSTEM') },
+      { value: 'STEERING_SYSTEM', label: t('common.carParts.STEERING_SYSTEM') },
+      { value: 'EXHAUST_SYSTEM', label: t('common.carParts.EXHAUST_SYSTEM') },
+      { value: 'TRANSMISSION', label: t('common.carParts.TRANSMISSION') },
+      { value: 'SUSPENSION', label: t('common.carParts.SUSPENSION') },
+      { value: 'ELECTRICAL_SYSTEM', label: t('common.carParts.ELECTRICAL_SYSTEM') },
+      { value: 'COOLING_SYSTEM', label: t('common.carParts.COOLING_SYSTEM') },
+      { value: 'FUEL_SYSTEM', label: t('common.carParts.FUEL_SYSTEM') },
+      { value: 'BODY_EXTERIOR', label: t('common.carParts.BODY_EXTERIOR') },
+      { value: 'BODY_INTERIOR', label: t('common.carParts.BODY_INTERIOR') },
+      { value: 'HVAC_SYSTEM', label: t('common.carParts.HVAC_SYSTEM') },
+      { value: 'SAFETY_SYSTEMS', label: t('common.carParts.SAFETY_SYSTEMS') },
+      { value: 'OTHER', label: t('common.carParts.OTHER') }
+    ]
+
     return (
       <SummaryReview
         title={t('dfmea.summary.title')}
@@ -480,6 +508,8 @@ function DFMEAFlow({ onBack }: DFMEAFlowProps) {
           {
             title: t('dfmea.summary.sectionBasicData'),
             fields: [
+              { label: t('common.createdBy'), value: 'System', fieldName: 'creator', placeholder: 'Nome do criador', readonly: true },
+              { label: t('dfmea.fields.carPart'), value: formData.carPart, fieldName: 'carPart', type: 'select', options: carPartOptions, placeholder: t('dfmea.fields.carPart') },
               { label: t('dfmea.fields.genericFailure'), value: formData.genericFailure, fullWidth: true, fieldName: 'genericFailure', type: 'text', placeholder: t('dfmea.fields.genericFailure') },
               { label: t('dfmea.fields.failureMode'), value: formData.failureMode, fullWidth: true, fieldName: 'failureMode', type: 'textarea', placeholder: t('dfmea.fields.failureMode') },
               { label: t('dfmea.fields.cause'), value: formData.cause, fullWidth: true, fieldName: 'cause', type: 'textarea', placeholder: t('dfmea.fields.cause') }
@@ -488,8 +518,8 @@ function DFMEAFlow({ onBack }: DFMEAFlowProps) {
           {
             title: 'Controles',
             fields: [
-              { label: 'Controle de Prevenção (EDPS)', value: formData.preventionControl?.description || 'Não vinculado', fullWidth: true, fieldName: 'preventionDescription', type: 'text', placeholder: 'Norma de prevenção' },
-              { label: 'Controle de Detecção (DVP)', value: formData.detectionControl?.description || 'Não vinculado', fullWidth: true, fieldName: 'detectionDescription', type: 'text', placeholder: 'Teste de detecção' }
+              { label: 'Controle de Prevenção (EDPS)', value: formData.preventionControl?.description || 'Não vinculado', fullWidth: true, fieldName: 'preventionDescription', type: 'text', placeholder: 'Norma de prevenção', readonly: true },
+              { label: 'Controle de Detecção (DVP)', value: formData.detectionControl?.description || 'Não vinculado', fullWidth: true, fieldName: 'detectionDescription', type: 'text', placeholder: 'Teste de detecção', readonly: true }
             ]
           },
           {
