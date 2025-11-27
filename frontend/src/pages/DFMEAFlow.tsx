@@ -1,15 +1,18 @@
 import { useState, useEffect, useRef } from 'react'
 import ChatInterface, { Message } from '../components/ChatInterface'
-import { dfmeaAPI, edpsAPI, dvpAPI, CreateDFMEAData, EDPS, DVP, exportAPI } from '../services/api'
+import SummaryReview from '../components/SummaryReview'
+import { dfmeaAPI, edpsAPI, dvpAPI, CreateDFMEAData, EDPS, DVP, exportAPI, aiToolsAPI } from '../services/api'
+import { useLanguage } from '../contexts/LanguageContext'
 import './Flow.css'
 
 interface DFMEAFlowProps {
   onBack: () => void
 }
 
-type Step = 'initial' | 'genericFailure' | 'failureMode' | 'cause' | 'prevention' | 'selectEdps' | 'detection' | 'selectDvp' | 'ratings' | 'confirm' | 'export' | 'complete'
+type Step = 'initial' | 'aiInput' | 'genericFailure' | 'failureMode' | 'cause' | 'prevention' | 'selectEdps' | 'detection' | 'selectDvp' | 'ratings' | 'confirm' | 'review' | 'export' | 'complete'
 
 function DFMEAFlow({ onBack }: DFMEAFlowProps) {
+  const { t } = useLanguage()
   const [messages, setMessages] = useState<Message[]>([])
   const [step, setStep] = useState<Step>('initial')
   const [isProcessing, setIsProcessing] = useState(false)
@@ -17,6 +20,7 @@ function DFMEAFlow({ onBack }: DFMEAFlowProps) {
   const [availableEdps, setAvailableEdps] = useState<EDPS[]>([])
   const [availableDvp, setAvailableDvp] = useState<DVP[]>([])
   const [createdDfmeaId, setCreatedDfmeaId] = useState<string>('')
+  const [isSaving, setIsSaving] = useState(false)
   const hasInitialized = useRef(false)
   
   const [formData, setFormData] = useState<CreateDFMEAData>({
@@ -31,10 +35,14 @@ function DFMEAFlow({ onBack }: DFMEAFlowProps) {
   useEffect(() => {
     if (!hasInitialized.current) {
       hasInitialized.current = true
-      addAssistantMessage('Hello! I can help you create a new DFMEA entry. What would you like to do?')
-      setQuickReplies(['Create new DFMEA', 'View existing DFMEAs'])
+      addAssistantMessage(t('dfmea.greeting'))
+      setQuickReplies([
+        t('dfmea.quickReplies.createNew'),
+        t('dfmea.quickReplies.useAI'),
+        t('dfmea.quickReplies.viewExisting')
+      ])
     }
-  }, [])
+  }, [t])
 
   const addAssistantMessage = (content: string) => {
     const message: Message = {
@@ -74,16 +82,27 @@ function DFMEAFlow({ onBack }: DFMEAFlowProps) {
   const processStep = async (userInput: string) => {
     switch (step) {
       case 'initial':
-        if (userInput.toLowerCase().includes('create') || userInput.toLowerCase().includes('new')) {
+        if (userInput.toLowerCase().includes('ai') || userInput.toLowerCase().includes('🤖') || userInput.toLowerCase().includes('ia')) {
+          addAssistantMessage(t('dfmea.aiPrompt'))
+          setStep('aiInput')
+        } else if (userInput.toLowerCase().includes('create') || userInput.toLowerCase().includes('new') || userInput.toLowerCase().includes('criar')) {
           addAssistantMessage('Great! Let\'s create a new DFMEA entry. Please describe the generic failure or system.')
           setStep('genericFailure')
-        } else if (userInput.toLowerCase().includes('view') || userInput.toLowerCase().includes('existing')) {
+        } else if (userInput.toLowerCase().includes('view') || userInput.toLowerCase().includes('existing') || userInput.toLowerCase().includes('ver')) {
           addAssistantMessage('Fetching existing DFMEA entries...')
           await fetchExistingDFMEA()
         } else {
           addAssistantMessage('I can help you create a new DFMEA or view existing entries. What would you like to do?')
-          setQuickReplies(['Create new DFMEA', 'View existing DFMEAs'])
+          setQuickReplies([
+            t('dfmea.quickReplies.createNew'),
+            t('dfmea.quickReplies.useAI'),
+            t('dfmea.quickReplies.viewExisting')
+          ])
         }
+        break
+
+      case 'aiInput':
+        await generateWithAI(userInput)
         break
 
       case 'genericFailure':
@@ -106,7 +125,8 @@ function DFMEAFlow({ onBack }: DFMEAFlowProps) {
         break
 
       case 'prevention':
-        if (userInput.toLowerCase().includes('yes') || userInput.toLowerCase().includes('link')) {
+        if (userInput.toLowerCase().includes('yes') || userInput.toLowerCase().includes('link') || 
+            userInput.toLowerCase().includes('sim') || userInput.toLowerCase().includes('vincular')) {
           await fetchEDPSNorms()
         } else {
           addAssistantMessage('Would you like to add a detection control (DVP test)?')
@@ -139,7 +159,8 @@ function DFMEAFlow({ onBack }: DFMEAFlowProps) {
         break
 
       case 'detection':
-        if (userInput.toLowerCase().includes('yes') || userInput.toLowerCase().includes('link')) {
+        if (userInput.toLowerCase().includes('yes') || userInput.toLowerCase().includes('link') || 
+            userInput.toLowerCase().includes('sim') || userInput.toLowerCase().includes('vincular')) {
           await fetchDVPTests()
         } else {
           addAssistantMessage('Now, let\'s rate the failure. On a scale of 1-10, what is the Severity?')
@@ -193,8 +214,10 @@ function DFMEAFlow({ onBack }: DFMEAFlowProps) {
         break
 
       case 'confirm':
-        if (userInput.toLowerCase().includes('yes') || userInput.toLowerCase().includes('save')) {
-          await saveDFMEA()
+        if (userInput.toLowerCase().includes('yes') || userInput.toLowerCase().includes('save') || 
+            userInput.toLowerCase().includes('sim') || userInput.toLowerCase().includes('revisar') || 
+            userInput.toLowerCase().includes('review')) {
+          setStep('review')
         } else {
           addAssistantMessage('DFMEA creation cancelled. Would you like to start over?')
           setQuickReplies(['Start over', 'Go back to home'])
@@ -205,22 +228,23 @@ function DFMEAFlow({ onBack }: DFMEAFlowProps) {
       case 'export':
         if (userInput.toLowerCase().includes('excel')) {
           exportAPI.exportDFMEAToExcel(createdDfmeaId)
-          addAssistantMessage('✅ Downloading Excel file...')
-          setQuickReplies(['Create another DFMEA', 'Go back to home'])
+          addAssistantMessage(`✅ ${t('common.downloadingExcel')}`)
+          setQuickReplies([`${t('common.createAnother')} DFMEA`, t('common.goBackToHome')])
           setStep('complete')
         } else if (userInput.toLowerCase().includes('pdf')) {
           exportAPI.exportDFMEAToPDF(createdDfmeaId)
-          addAssistantMessage('✅ Downloading PDF file...')
-          setQuickReplies(['Create another DFMEA', 'Go back to home'])
+          addAssistantMessage(`✅ ${t('common.downloadingPDF')}`)
+          setQuickReplies([`${t('common.createAnother')} DFMEA`, t('common.goBackToHome')])
           setStep('complete')
         } else {
-          setQuickReplies(['Create another DFMEA', 'Go back to home'])
+          setQuickReplies([`${t('common.createAnother')} DFMEA`, t('common.goBackToHome')])
           setStep('complete')
         }
         break
 
       case 'complete':
-        if (userInput.toLowerCase().includes('another')) {
+        if (userInput.toLowerCase().includes('another') || userInput.toLowerCase().includes('outro') || 
+            userInput.toLowerCase().includes('create') || userInput.toLowerCase().includes('criar')) {
           resetForm()
         } else {
           onBack()
@@ -278,19 +302,26 @@ function DFMEAFlow({ onBack }: DFMEAFlowProps) {
     }
   }
 
-  const saveDFMEA = async () => {
+  const handleSaveFromReview = async () => {
+    setIsSaving(true)
     try {
-      addAssistantMessage('Saving your DFMEA entry...')
       const response = await dfmeaAPI.create(formData)
       setCreatedDfmeaId(response.data.data.id)
-      
-      addAssistantMessage(`✅ Success! DFMEA entry created with ID: ${response.data.data.id}. Would you like to export it?`)
-      setQuickReplies(['Export as Excel', 'Export as PDF', 'No, continue'])
+      addAssistantMessage(`✅ ${t('common.successCreatedWithId')} ${response.data.data.id}. ${t('common.wouldYouLikeToExport')}`)
+      setQuickReplies([t('common.exportAsExcel'), t('common.exportAsPDF'), t('common.noContinue')])
       setStep('export')
     } catch (error) {
-      addAssistantMessage('❌ Sorry, there was an error saving the DFMEA entry. Please try again.')
-      setQuickReplies(['Retry', 'Go back to home'])
+      addAssistantMessage(`❌ ${t('common.errorSaving')}`)
+      setQuickReplies([t('common.retry'), t('common.goBack')])
+      setStep('initial')
+    } finally {
+      setIsSaving(false)
     }
+  }
+
+  const handleEditFromReview = () => {
+    setStep('genericFailure')
+    addAssistantMessage('Let\'s edit the DFMEA. Please describe the generic failure or system.')
   }
 
   const fetchExistingDFMEA = async () => {
@@ -315,6 +346,104 @@ function DFMEAFlow({ onBack }: DFMEAFlowProps) {
     }
   }
 
+  const parseAIResponse = (aiData: any) => {
+    console.log('Raw AI Data:', aiData)
+    console.log('AI Data Type:', typeof aiData)
+    
+    let parsedData = aiData
+    
+    // If it's a string, try to parse it
+    if (typeof aiData === 'string') {
+      try {
+        let cleanedData = aiData.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
+        parsedData = JSON.parse(cleanedData)
+      } catch (e) {
+        console.warn('Failed to parse AI response as JSON, using as-is')
+        parsedData = { failureMode: aiData }
+      }
+    }
+
+    // Handle nested response structure (SAI Library might wrap the response)
+    if (parsedData.response || parsedData.output || parsedData.result) {
+      parsedData = parsedData.response || parsedData.output || parsedData.result
+    }
+
+    // Extract fields - SAI Library uses these specific field names:
+    // Generic_failure, Potencial_failure_modes, Potencial_effect(s)_of_failure
+    // Note: "Potencial" is Portuguese spelling (1 't'), not "Potential" English (2 't's)
+    
+    // Generic Failure
+    const genericFailure = parsedData['Generic_failure'] || parsedData['generic_failure'] || 
+                          parsedData['genericFailure'] ||
+                          parsedData['falha_generica'] || parsedData['falha_genérica'] ||
+                          parsedData['system'] || parsedData['sistema'] || 
+                          parsedData['component'] || parsedData['componente'] || ''
+    
+    // Failure Mode - SAI uses "Potencial" (Portuguese - 1 't')
+    const failureMode = parsedData['Potencial_failure_modes'] || parsedData['Potential_failure_modes'] || 
+                       parsedData['potential_failure_modes'] ||
+                       parsedData['failureMode'] || parsedData['failure_mode'] || 
+                       parsedData['modo_de_falha'] || parsedData['mode'] || 
+                       parsedData['falha'] || ''
+    
+    // Cause / Effects - SAI uses "Potencial" (Portuguese - 1 't')
+    const cause = parsedData['Potencial_effect(s)_of_failure'] || 
+                 parsedData['Potential_effect(s)_of_failure'] || 
+                 parsedData['Potential_effects_of_failure'] ||
+                 parsedData['potential_effects_of_failure'] ||
+                 parsedData['cause'] || parsedData['causa'] || 
+                 parsedData['rootCause'] || parsedData['root_cause'] ||
+                 parsedData['causa_raiz'] || parsedData['effects'] || parsedData['effect'] || ''
+                 
+    const severity = parseInt(parsedData.severity || parsedData.severidade || parsedData.severidad || '5') || 5
+    const occurrence = parseInt(parsedData.occurrence || parsedData.ocorrencia || parsedData.ocorrência || parsedData.ocurrencia || '5') || 5
+    const detection = parseInt(parsedData.detection || parsedData.deteccao || parsedData.detecção || parsedData.deteccion || '5') || 5
+
+    const result = {
+      genericFailure,
+      failureMode,
+      cause,
+      severity,
+      occurrence,
+      detection
+    }
+    
+    console.log('Parsed Result:', result)
+    return result
+  }
+
+  const generateWithAI = async (description: string) => {
+    try {
+      addAssistantMessage(t('dfmea.messages.aiGenerating'))
+      const response = await aiToolsAPI.generateDFMEA(description)
+      
+      if (response.data.success) {
+        console.log('DFMEA AI Response:', response.data.data)
+        const parsed = parseAIResponse(response.data.data)
+        console.log('Parsed DFMEA Data:', parsed)
+        
+        const rpn = parsed.severity * parsed.occurrence * parsed.detection
+        
+        // Show more details in the message
+        addAssistantMessage(`${t('dfmea.messages.aiSuccess')}\n\n**${t('dfmea.messages.genericFailureLabel')}** ${parsed.genericFailure || t('common.empty')}\n**${t('dfmea.messages.failureModeLabel')}** ${parsed.failureMode || t('common.empty')}\n**${t('dfmea.messages.causeLabel')}** ${parsed.cause || t('common.empty')}\n**${t('dfmea.messages.rpnLabel')}** ${rpn}\n\n${t('dfmea.messages.aiSuccessDetail')}`)
+        
+        setFormData(prev => ({
+          ...prev,
+          ...parsed
+        }))
+        setQuickReplies([t('common.yesReviewIt'), t('common.noStartOver')])
+        setStep('confirm')
+      } else {
+        throw new Error((response.data as any).error || 'AI generation failed')
+      }
+    } catch (error: any) {
+      console.error('AI Tool Error:', error)
+      addAssistantMessage(`${t('dfmea.messages.aiError')} ${error.response?.data?.error || error.message}. ${t('dfmea.messages.createManually')}`)
+      setQuickReplies([t('common.createManually'), t('common.tryAgain'), t('common.goBack')])
+      setStep('initial')
+    }
+  }
+
   const resetForm = () => {
     setFormData({
       genericFailure: '',
@@ -326,17 +455,76 @@ function DFMEAFlow({ onBack }: DFMEAFlowProps) {
     })
     setStep('initial')
     addAssistantMessage('Let\'s create another DFMEA entry! What would you like to do?')
-    setQuickReplies(['Create new DFMEA', 'View existing DFMEAs'])
+    setQuickReplies(['Create new DFMEA', 'Use AI Tool 🤖', 'View existing DFMEAs'])
+  }
+
+  const handleFieldChange = (fieldName: string, value: string | number) => {
+    setFormData(prev => ({
+      ...prev,
+      [fieldName]: value
+    }))
+  }
+
+  if (step === 'review') {
+    const warningMessage = !formData.genericFailure || !formData.failureMode 
+      ? 'Você precisa preencher todos os campos em Dados Básicos antes de salvar.'
+      : undefined
+
+    const rpn = (formData.severity || 0) * (formData.occurrence || 0) * (formData.detection || 0)
+
+    return (
+      <SummaryReview
+        title={t('dfmea.summary.title')}
+        subtitle={t('dfmea.summary.subtitle')}
+        sections={[
+          {
+            title: t('dfmea.summary.sectionBasicData'),
+            fields: [
+              { label: t('dfmea.fields.genericFailure'), value: formData.genericFailure, fullWidth: true, fieldName: 'genericFailure', type: 'text', placeholder: t('dfmea.fields.genericFailure') },
+              { label: t('dfmea.fields.failureMode'), value: formData.failureMode, fullWidth: true, fieldName: 'failureMode', type: 'textarea', placeholder: t('dfmea.fields.failureMode') },
+              { label: t('dfmea.fields.cause'), value: formData.cause, fullWidth: true, fieldName: 'cause', type: 'textarea', placeholder: t('dfmea.fields.cause') }
+            ]
+          },
+          {
+            title: 'Controles',
+            fields: [
+              { label: 'Controle de Prevenção (EDPS)', value: formData.preventionControl?.description || 'Não vinculado', fullWidth: true, fieldName: 'preventionDescription', type: 'text', placeholder: 'Norma de prevenção' },
+              { label: 'Controle de Detecção (DVP)', value: formData.detectionControl?.description || 'Não vinculado', fullWidth: true, fieldName: 'detectionDescription', type: 'text', placeholder: 'Teste de detecção' }
+            ]
+          },
+          {
+            title: t('dfmea.summary.sectionRatings'),
+            fields: [
+              { label: t('dfmea.fields.severity'), value: formData.severity, fieldName: 'severity', type: 'number', placeholder: '1-10' },
+              { label: t('dfmea.fields.occurrence'), value: formData.occurrence, fieldName: 'occurrence', type: 'number', placeholder: '1-10' },
+              { label: t('dfmea.fields.detection'), value: formData.detection, fieldName: 'detection', type: 'number', placeholder: '1-10' },
+              { label: t('dfmea.fields.rpn'), value: rpn, fieldName: 'rpn', type: 'number', placeholder: 'Auto-calculado' }
+            ]
+          }
+        ]}
+        metrics={[
+          { icon: '⚠️', value: formData.severity || 0, label: t('dfmea.fields.severity') },
+          { icon: '🔄', value: formData.occurrence || 0, label: t('dfmea.fields.occurrence') },
+          { icon: '🔍', value: formData.detection || 0, label: t('dfmea.fields.detection') }
+        ]}
+        statusBadge={{ label: t('common.draft'), type: 'draft' }}
+        onSave={handleSaveFromReview}
+        onEdit={handleEditFromReview}
+        onFieldChange={handleFieldChange}
+        isSaving={isSaving}
+        warningMessage={warningMessage}
+      />
+    )
   }
 
   return (
     <div className="flow-container">
       <div className="flow-header">
         <button className="back-button" onClick={onBack}>
-          ← Back to Home
+          ← {t('common.backToHome')}
         </button>
-        <h2>⚠️ DFMEA - Design Failure Mode and Effects Analysis</h2>
-        <p className="flow-description">Analyze failure modes and link prevention/detection controls</p>
+        <h2>⚠️ {t('dfmea.title')}</h2>
+        <p className="flow-description">{t('dfmea.description')}</p>
       </div>
       
       <ChatInterface
@@ -345,7 +533,7 @@ function DFMEAFlow({ onBack }: DFMEAFlowProps) {
         onQuickReply={handleQuickReply}
         quickReplies={quickReplies}
         isProcessing={isProcessing}
-        placeholder="Type your response..."
+        placeholder={t('chat.placeholder')}
       />
     </div>
   )

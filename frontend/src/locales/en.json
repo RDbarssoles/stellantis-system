@@ -1,0 +1,231 @@
+{
+  "common": {
+    "backToHome": "Back to Home",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "create": "Create",
+    "view": "View",
+    "search": "Search",
+    "loading": "Loading...",
+    "retry": "Retry",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "startOver": "Start over",
+    "goBack": "Go back",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "draft": "Draft",
+    "yesReviewIt": "Yes, review it",
+    "noStartOver": "No, start over",
+    "createManually": "Create manually",
+    "tryAgain": "Try AI again",
+    "empty": "(empty)",
+    "wouldYouLikeToReview": "Would you like to review and save",
+    "exportAsExcel": "Export as Excel",
+    "exportAsPDF": "Export as PDF",
+    "noContinue": "No, continue",
+    "wouldYouLikeToExport": "Would you like to export it?",
+    "successCreatedWithId": "Success! Created with ID:",
+    "errorSaving": "Sorry, there was an error saving. Please try again.",
+    "downloadingExcel": "Downloading Excel file...",
+    "downloadingPDF": "Downloading PDF file...",
+    "createAnother": "Create another",
+    "goBackToHome": "Go back to home"
+  },
+  "home": {
+    "welcome": "Welcome to PD-SmartDoc",
+    "subtitle": "Your conversational assistant for engineering document management. Select a module below to get started.",
+    "searchAction": {
+      "title": "Search & Browse Documents",
+      "description": "View all EDPS, DVP&R, and DFMEA documents in one place"
+    },
+    "modules": {
+      "edps": {
+        "title": "EDPS",
+        "fullName": "Engineering Design Practices",
+        "description": "Create and manage engineering norms and standards"
+      },
+      "dvp": {
+        "title": "DVP&R",
+        "fullName": "Design Validation Plan & Results",
+        "description": "Define test procedures and validation criteria"
+      },
+      "dfmea": {
+        "title": "DFMEA",
+        "fullName": "Design Failure Mode and Effects Analysis",
+        "description": "Analyze failure modes and link prevention/detection controls"
+      }
+    },
+    "howItWorks": {
+      "title": "How it works",
+      "step1": {
+        "title": "Create Standards",
+        "description": "Define EDPS norms with detailed procedures and guidelines"
+      },
+      "step2": {
+        "title": "Define Tests",
+        "description": "Create DVP test procedures with acceptance criteria"
+      },
+      "step3": {
+        "title": "Link in DFMEA",
+        "description": "Connect norms and tests to failure modes for complete traceability"
+      }
+    }
+  },
+  "chat": {
+    "placeholder": "Type your response...",
+    "sending": "Sending..."
+  },
+  "edps": {
+    "title": "EDPS - Engineering Design Practices",
+    "description": "Create and manage engineering norms and standards",
+    "greeting": "Hello! I can help you create a new EDPS norm. What would you like to do?",
+    "quickReplies": {
+      "createNew": "Create new norm",
+      "useAI": "Use AI Tool 🤖",
+      "viewExisting": "View existing norms"
+    },
+    "aiPrompt": "Great! I'll use the AI tool to help you create an EDPS norm. Please describe what kind of norm you want to create. Be as detailed as possible.\n\nFor example: \"Create a norm for tire change procedure including safety steps and required tools\"",
+    "fields": {
+      "normNumber": "Norm Number",
+      "title": "Title",
+      "description": "Description",
+      "target": "Target/Objective",
+      "images": "Images"
+    },
+    "summary": {
+      "title": "New Norm",
+      "subtitle": "Review all information before saving",
+      "sectionBasicData": "Basic Data",
+      "sectionImages": "Attached Images"
+    },
+    "messages": {
+      "normCreated": "✅ Success! Norm has been created with ID:",
+      "normCreatedDetail": "Would you like to link this norm to a DFMEA entry?",
+      "errorSaving": "❌ Sorry, there was an error saving the norm. Please try again.",
+      "aiGenerating": "🤖 Generating EDPS norm with AI... This may take a moment.",
+      "aiSuccess": "✅ AI has generated the content!",
+      "aiSuccessDetail": "Would you like to review and save this norm?",
+      "aiError": "❌ Sorry, there was an error using the AI tool:",
+      "createManually": "Would you like to create the norm manually instead?",
+      "titleLabel": "Title:",
+      "descriptionLabel": "Description:",
+      "yesLinkToDFMEA": "Yes, link to DFMEA",
+      "noCreateAnother": "No, create another norm"
+    }
+  },
+  "dvp": {
+    "title": "DVP&R - Design Validation Plan & Results",
+    "description": "Define test procedures and validation criteria",
+    "greeting": "Hello! I can help you create a new DVP test procedure. What would you like to do?",
+    "quickReplies": {
+      "createNew": "Create new test",
+      "useAI": "Use AI Tool 🤖",
+      "viewExisting": "View existing tests"
+    },
+    "aiPrompt": "Great! I'll use the AI tool to help you create a DVP test procedure. Please describe what kind of test you want to create.\n\nFor example: \"Create a functional test for tire extraction force, measuring between 50N and 100N\"",
+    "fields": {
+      "procedureId": "Procedure ID",
+      "procedureType": "Type",
+      "testName": "Test Name",
+      "objective": "Objective",
+      "acceptanceCriteria": "Acceptance Criteria",
+      "responsible": "Responsible",
+      "parameterRange": "Parameter Range"
+    },
+    "summary": {
+      "title": "New Test",
+      "subtitle": "Navigate freely between steps",
+      "sectionBasicData": "Basic Data"
+    },
+    "messages": {
+      "testCreated": "✅ Success! Test procedure has been created with ID:",
+      "testCreatedDetail": "Would you like to link this test to a DFMEA entry?",
+      "errorSaving": "❌ Sorry, there was an error saving the test. Please try again.",
+      "aiGenerating": "🤖 Generating DVP test procedure with AI... This may take a moment.",
+      "aiSuccess": "✅ AI has generated the content!",
+      "aiSuccessDetail": "Would you like to review and save this test?",
+      "aiError": "❌ Sorry, there was an error using the AI tool:",
+      "createManually": "Would you like to create the test manually instead?",
+      "testLabel": "Test:",
+      "criteriaLabel": "Criteria:",
+      "yesLinkToDFMEA": "Yes, link to DFMEA",
+      "noCreateAnotherTest": "No, create another test"
+    }
+  },
+  "dfmea": {
+    "title": "DFMEA - Design Failure Mode and Effects Analysis",
+    "description": "Analyze failure modes and link prevention/detection controls",
+    "greeting": "Hello! I can help you create a new DFMEA analysis. What would you like to do?",
+    "quickReplies": {
+      "createNew": "Create new DFMEA",
+      "useAI": "Use AI Tool 🤖",
+      "viewExisting": "View existing analyses"
+    },
+    "aiPrompt": "Great! I'll use the AI tool to help you create a DFMEA analysis. Please describe the failure scenario you want to analyze.\n\nFor example: \"Analyze tire mounting system failure - tire detachment during operation\"",
+    "fields": {
+      "genericFailure": "Generic Failure",
+      "failureMode": "Failure Mode",
+      "cause": "Cause/Effect",
+      "severity": "Severity",
+      "occurrence": "Occurrence",
+      "detection": "Detection",
+      "rpn": "RPN"
+    },
+    "summary": {
+      "title": "New DFMEA Analysis",
+      "subtitle": "Review all information before saving",
+      "sectionBasicData": "Basic Data",
+      "sectionRatings": "Risk Ratings"
+    },
+    "messages": {
+      "dfmeaCreated": "✅ Success! DFMEA analysis has been created with ID:",
+      "errorSaving": "❌ Sorry, there was an error saving the DFMEA. Please try again.",
+      "aiGenerating": "🤖 Generating DFMEA analysis with AI... This may take a moment.",
+      "aiSuccess": "✅ AI has generated the analysis!",
+      "aiSuccessDetail": "Would you like to review and save this DFMEA?",
+      "aiError": "❌ Sorry, there was an error using the AI tool:",
+      "createManually": "Would you like to create the analysis manually instead?",
+      "genericFailureLabel": "Generic Failure:",
+      "failureModeLabel": "Failure Mode:",
+      "causeLabel": "Cause:",
+      "rpnLabel": "RPN:"
+    }
+  },
+  "search": {
+    "title": "🔍 Search Documents",
+    "description": "Search and browse all engineering documents",
+    "placeholder": "Search norms by number or title...",
+    "filters": {
+      "all": "All",
+      "edps": "EDPS",
+      "dvp": "DVP&R",
+      "dfmea": "DFMEA"
+    },
+    "results": "Results",
+    "noResults": {
+      "title": "No documents found",
+      "description": "Try adjusting your search query or filters"
+    },
+    "loading": "Loading documents...",
+    "createdBy": "Created by:",
+    "creationDate": "Creation date:",
+    "lastEdited": "Last edited:"
+  },
+  "summaryReview": {
+    "title": "Final Review",
+    "subtitle": "Review all information before saving",
+    "save": "💾 Save",
+    "warningTitle": "Required fields not filled",
+    "status": "Status",
+    "metrics": {
+      "relatedTests": "Related Tests",
+      "norms": "Norms",
+      "failures": "Failures"
+    }
+  }
+}
+

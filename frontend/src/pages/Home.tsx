@@ -1,4 +1,5 @@
 import { Page } from '../App'
+import { useLanguage } from '../contexts/LanguageContext'
 import './Home.css'
 
 interface HomeProps {
@@ -6,28 +7,30 @@ interface HomeProps {
 }
 
 function Home({ onNavigate }: HomeProps) {
+  const { t } = useLanguage()
+
   const modules = [
     {
       id: 'edps',
-      title: 'EDPS',
-      fullName: 'Engineering Design Practices',
-      description: 'Create and manage engineering norms and standards',
+      title: t('home.modules.edps.title'),
+      fullName: t('home.modules.edps.fullName'),
+      description: t('home.modules.edps.description'),
       icon: '📋',
       color: '#4472C4'
     },
     {
       id: 'dvp',
-      title: 'DVP&R',
-      fullName: 'Design Validation Plan & Results',
-      description: 'Define test procedures and validation criteria',
+      title: t('home.modules.dvp.title'),
+      fullName: t('home.modules.dvp.fullName'),
+      description: t('home.modules.dvp.description'),
       icon: '🔬',
       color: '#70AD47'
     },
     {
       id: 'dfmea',
-      title: 'DFMEA',
-      fullName: 'Design Failure Mode and Effects Analysis',
-      description: 'Analyze failure modes and link prevention/detection controls',
+      title: t('home.modules.dfmea.title'),
+      fullName: t('home.modules.dfmea.fullName'),
+      description: t('home.modules.dfmea.description'),
       icon: '⚠️',
       color: '#ED7D31'
     }
@@ -36,10 +39,9 @@ function Home({ onNavigate }: HomeProps) {
   return (
     <div className="home-container">
       <div className="welcome-section">
-        <h2>Welcome to PD-SmartDoc</h2>
+        <h2>{t('home.welcome')}</h2>
         <p className="welcome-text">
-          Your conversational assistant for engineering document management.
-          Select a module below to get started.
+          {t('home.subtitle')}
         </p>
       </div>
 
@@ -50,8 +52,8 @@ function Home({ onNavigate }: HomeProps) {
         >
           <span className="search-action-icon">🔍</span>
           <div className="search-action-content">
-            <h3>Search & Browse Documents</h3>
-            <p>View all EDPS, DVP&R, and DFMEA documents in one place</p>
+            <h3>{t('home.searchAction.title')}</h3>
+            <p>{t('home.searchAction.description')}</p>
           </div>
           <span className="search-action-arrow">→</span>
         </button>
@@ -75,22 +77,22 @@ function Home({ onNavigate }: HomeProps) {
       </div>
 
       <div className="info-section">
-        <h3>How it works</h3>
+        <h3>{t('home.howItWorks.title')}</h3>
         <div className="info-cards">
           <div className="info-card">
             <div className="info-number">1</div>
-            <h4>Create Standards</h4>
-            <p>Define EDPS norms with detailed procedures and guidelines</p>
+            <h4>{t('home.howItWorks.step1.title')}</h4>
+            <p>{t('home.howItWorks.step1.description')}</p>
           </div>
           <div className="info-card">
             <div className="info-number">2</div>
-            <h4>Define Tests</h4>
-            <p>Create DVP test procedures with acceptance criteria</p>
+            <h4>{t('home.howItWorks.step2.title')}</h4>
+            <p>{t('home.howItWorks.step2.description')}</p>
           </div>
           <div className="info-card">
             <div className="info-number">3</div>
-            <h4>Link in DFMEA</h4>
-            <p>Connect norms and tests to failure modes for complete traceability</p>
+            <h4>{t('home.howItWorks.step3.title')}</h4>
+            <p>{t('home.howItWorks.step3.description')}</p>
           </div>
         </div>
       </div>

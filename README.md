@@ -62,7 +62,28 @@ npm install
 
 ## ▶️ Running the Application
 
-### Option 1: Run Backend and Frontend Separately
+### Option 1: Using Docker (Recommended for Production)
+
+**Prerequisites:** Docker and Docker Compose installed
+
+```bash
+# Build and start all services
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Access the application
+# Frontend: http://localhost
+# Backend API: http://localhost:3001
+
+# Stop services
+docker-compose down
+```
+
+For detailed Docker instructions, see [README.Docker.md](README.Docker.md)
+
+### Option 2: Run Backend and Frontend Separately (Development)
 
 **Terminal 1 - Backend:**
 ```bash
@@ -78,7 +99,20 @@ npm run dev
 ```
 Frontend will run on: `http://localhost:3000`
 
-### Option 2: Using PowerShell (Windows)
+### Option 3: Using Docker for Development (with hot-reload)
+
+```bash
+# Start development environment
+docker-compose -f docker-compose.dev.yml up -d
+
+# View logs
+docker-compose -f docker-compose.dev.yml logs -f
+
+# Stop development environment
+docker-compose -f docker-compose.dev.yml down
+```
+
+### Option 4: Using PowerShell (Windows)
 
 ```powershell
 # Terminal 1 - Backend
@@ -219,13 +253,27 @@ GET    /api/export/dfmea/all/excel      - Export all DFMEAs to Excel
 
 ## 📁 Data Storage
 
+### Current Solution: JSON File-Based Storage
+
 Data is stored in JSON files located in `backend/data/`:
 
 - `edps.json` - EDPS norms
 - `dvp.json` - DVP test procedures
 - `dfmea.json` - DFMEA entries
 
-**Note:** This is a minimal implementation. For production, replace with a proper database (PostgreSQL, MongoDB, etc.)
+**Storage Mechanism:**
+- Simple file-system based storage using Node.js `fs` module
+- Data persisted to disk on every create/update/delete operation
+- Suitable for prototyping and small-scale deployments
+- When using Docker, data is persisted in a Docker volume to survive container restarts
+
+**Limitations:**
+- No transaction support
+- Limited concurrency handling
+- Not suitable for high-traffic production environments
+- No built-in backup/replication
+
+**Note:** This is a minimal implementation. For production, replace with a proper database (PostgreSQL, MongoDB, etc.). See "Next Steps for Production" section below.
 
 ## 🐛 Troubleshooting
 
@@ -304,9 +352,22 @@ taskkill /PID <process_id> /F
 ✅ **Traceability** - Complete linkage between requirements, validation, and risks  
 ✅ **Collaboration** - Centralized system accessible to all team members  
 
+## 🐳 Docker Deployment
+
+The application is fully containerized and ready for deployment. Docker configuration includes:
+
+- **Production Setup**: Optimized multi-stage builds with Nginx
+- **Development Setup**: Hot-reload enabled for rapid development
+- **Data Persistence**: Docker volumes ensure data survives container restarts
+- **Health Checks**: Automated health monitoring for both services
+- **Network Isolation**: Services communicate through a dedicated Docker network
+
+For complete Docker documentation, see [README.Docker.md](README.Docker.md)
+
 ## 🚀 Next Steps for Production
 
 ### Phase 1 - Foundation
+- [x] Docker containerization (completed)
 - [ ] Replace JSON storage with PostgreSQL/MongoDB
 - [ ] Add user authentication (JWT/OAuth)
 - [ ] Implement role-based access control (RBAC)

@@ -1,19 +1,23 @@
 import { useState, useEffect, useRef } from 'react'
 import ChatInterface, { Message } from '../components/ChatInterface'
-import { edpsAPI, CreateEDPSData } from '../services/api'
+import SummaryReview from '../components/SummaryReview'
+import { edpsAPI, CreateEDPSData, aiToolsAPI } from '../services/api'
+import { useLanguage } from '../contexts/LanguageContext'
 import './Flow.css'
 
 interface EDPSFlowProps {
   onBack: () => void
 }
 
-type Step = 'initial' | 'number' | 'title' | 'description' | 'target' | 'images' | 'confirm' | 'complete'
+type Step = 'initial' | 'aiInput' | 'number' | 'title' | 'description' | 'target' | 'images' | 'confirm' | 'review' | 'complete'
 
 function EDPSFlow({ onBack }: EDPSFlowProps) {
+  const { t } = useLanguage()
   const [messages, setMessages] = useState<Message[]>([])
   const [step, setStep] = useState<Step>('initial')
   const [isProcessing, setIsProcessing] = useState(false)
   const [quickReplies, setQuickReplies] = useState<string[]>([])
+  const [isSaving, setIsSaving] = useState(false)
   const hasInitialized = useRef(false)
   
   const [formData, setFormData] = useState<CreateEDPSData>({
@@ -27,10 +31,14 @@ function EDPSFlow({ onBack }: EDPSFlowProps) {
   useEffect(() => {
     if (!hasInitialized.current) {
       hasInitialized.current = true
-      addAssistantMessage('Hello! I can help you create a new EDPS norm. What would you like to do?')
-      setQuickReplies(['Create new norm', 'View existing norms'])
+      addAssistantMessage(t('edps.greeting'))
+      setQuickReplies([
+        t('edps.quickReplies.createNew'),
+        t('edps.quickReplies.useAI'),
+        t('edps.quickReplies.viewExisting')
+      ])
     }
-  }, [])
+  }, [t])
 
   const addAssistantMessage = (content: string) => {
     const message: Message = {
@@ -70,18 +78,29 @@ function EDPSFlow({ onBack }: EDPSFlowProps) {
   const processStep = (userInput: string) => {
     switch (step) {
       case 'initial':
-        if (userInput.toLowerCase().includes('create') || userInput.toLowerCase().includes('new')) {
+        if (userInput.toLowerCase().includes('ai') || userInput.toLowerCase().includes('🤖') || userInput.toLowerCase().includes('ia')) {
+          addAssistantMessage(t('edps.aiPrompt'))
+          setStep('aiInput')
+        } else if (userInput.toLowerCase().includes('create') || userInput.toLowerCase().includes('new') || userInput.toLowerCase().includes('criar')) {
           const suggestedNumber = Math.floor(10000 + Math.random() * 90000).toString()
           setFormData(prev => ({ ...prev, normNumber: suggestedNumber }))
           addAssistantMessage(`Great! Let's create a new EDPS norm. I suggest the norm number: ${suggestedNumber}. Please provide a title for this norm.`)
           setStep('title')
-        } else if (userInput.toLowerCase().includes('view') || userInput.toLowerCase().includes('existing')) {
+        } else if (userInput.toLowerCase().includes('view') || userInput.toLowerCase().includes('existing') || userInput.toLowerCase().includes('ver')) {
           addAssistantMessage('Fetching existing norms...')
           fetchExistingNorms()
         } else {
           addAssistantMessage('I can help you create a new norm or view existing norms. What would you like to do?')
-          setQuickReplies(['Create new norm', 'View existing norms'])
+          setQuickReplies([
+            t('edps.quickReplies.createNew'),
+            t('edps.quickReplies.useAI'),
+            t('edps.quickReplies.viewExisting')
+          ])
         }
+        break
+
+      case 'aiInput':
+        generateWithAI(userInput)
         break
 
       case 'title':
@@ -114,8 +133,10 @@ function EDPSFlow({ onBack }: EDPSFlowProps) {
         break
 
       case 'confirm':
-        if (userInput.toLowerCase().includes('yes') || userInput.toLowerCase().includes('save')) {
-          saveNorm()
+        if (userInput.toLowerCase().includes('yes') || userInput.toLowerCase().includes('save') || 
+            userInput.toLowerCase().includes('sim') || userInput.toLowerCase().includes('revisar') || 
+            userInput.toLowerCase().includes('review')) {
+          setStep('review')
         } else {
           addAssistantMessage('Norm creation cancelled. Would you like to start over?')
           setQuickReplies(['Start over', 'Go back to home'])
@@ -124,7 +145,8 @@ function EDPSFlow({ onBack }: EDPSFlowProps) {
         break
 
       case 'complete':
-        if (userInput.toLowerCase().includes('another')) {
+        if (userInput.toLowerCase().includes('another') || userInput.toLowerCase().includes('outro') || 
+            userInput.toLowerCase().includes('create') || userInput.toLowerCase().includes('criar')) {
           resetForm()
         } else {
           onBack()
@@ -136,18 +158,25 @@ function EDPSFlow({ onBack }: EDPSFlowProps) {
     }
   }
 
-  const saveNorm = async () => {
+  const handleSaveFromReview = async () => {
+    setIsSaving(true)
     try {
-      addAssistantMessage('Saving your norm...')
       const response = await edpsAPI.create(formData)
-      
-      addAssistantMessage(`✅ Success! Norm ${formData.normNumber} has been created with ID: ${response.data.data.id}. Would you like to link this norm to a DFMEA entry?`)
-      setQuickReplies(['Yes, link to DFMEA', 'No, create another norm', 'Go back to home'])
+      addAssistantMessage(`${t('edps.messages.normCreated')} ${response.data.data.id}. ${t('edps.messages.normCreatedDetail')}`)
+      setQuickReplies([t('edps.messages.yesLinkToDFMEA'), t('edps.messages.noCreateAnother'), t('common.goBackToHome')])
       setStep('complete')
     } catch (error) {
-      addAssistantMessage('❌ Sorry, there was an error saving the norm. Please try again.')
-      setQuickReplies(['Retry', 'Go back to home'])
+      addAssistantMessage(t('edps.messages.errorSaving'))
+      setQuickReplies([t('common.retry'), t('common.goBackToHome')])
+      setStep('initial')
+    } finally {
+      setIsSaving(false)
     }
+  }
+
+  const handleEditFromReview = () => {
+    setStep('title')
+    addAssistantMessage('Let\'s edit the norm. Please provide a new title or continue with the existing information.')
   }
 
   const fetchExistingNorms = async () => {
@@ -172,6 +201,77 @@ function EDPSFlow({ onBack }: EDPSFlowProps) {
     }
   }
 
+  const parseAIResponse = (aiData: any) => {
+    console.log('EDPS Raw AI Data:', aiData)
+    console.log('EDPS AI Data Type:', typeof aiData)
+    
+    let parsedData = aiData
+
+    // If the response is a string that looks like JSON, try to parse it
+    if (typeof aiData === 'string') {
+      try {
+        // Clean up the string - remove markdown code blocks if present
+        let cleanedData = aiData.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
+        parsedData = JSON.parse(cleanedData)
+      } catch (e) {
+        console.warn('Failed to parse EDPS AI response as JSON')
+        // If parsing fails, treat the whole string as description
+        parsedData = { description: aiData }
+      }
+    }
+
+    // Handle nested response structure
+    if (parsedData.response || parsedData.output || parsedData.result) {
+      parsedData = parsedData.response || parsedData.output || parsedData.result
+    }
+
+    // Extract fields with various possible naming conventions
+    const normNumber = parsedData.normNumber || parsedData.numero_da_norma || parsedData.number || parsedData.numero || Math.floor(10000 + Math.random() * 90000).toString()
+    const title = parsedData.title || parsedData.titulo || parsedData.nome_da_norma || parsedData.name || parsedData.nome || ''
+    const description = parsedData.description || parsedData.descricao || parsedData.descrição_da_norma || parsedData.procedimento || parsedData.content || parsedData.conteudo || parsedData.conteúdo || ''
+    const target = parsedData.target || parsedData.objetivo || parsedData.target_da_norma || parsedData.objective || parsedData.meta || ''
+
+    const result = {
+      normNumber: normNumber.toString(),
+      title,
+      description,
+      target,
+      images: []
+    }
+    
+    console.log('EDPS Parsed Result:', result)
+    return result
+  }
+
+  const generateWithAI = async (description: string) => {
+    try {
+      addAssistantMessage(t('edps.messages.aiGenerating'))
+      const response = await aiToolsAPI.generateEDPS(description)
+      
+      if (response.data.success) {
+        console.log('EDPS AI Response:', response.data.data)
+        const parsed = parseAIResponse(response.data.data)
+        console.log('Parsed EDPS Data:', parsed)
+        
+        addAssistantMessage(`${t('edps.messages.aiSuccess')}\n\n**${t('edps.messages.titleLabel')}** ${parsed.title || t('common.empty')}\n**${t('edps.messages.descriptionLabel')}** ${parsed.description ? parsed.description.substring(0, 200) + (parsed.description.length > 200 ? '...' : '') : t('common.empty')}\n\n${t('edps.messages.aiSuccessDetail')}`)
+        
+        setFormData(prev => ({
+          ...prev,
+          ...parsed
+        }))
+        setQuickReplies([t('common.yesReviewIt'), t('common.noStartOver')])
+        setStep('confirm')
+      } else {
+        throw new Error((response.data as any).error || 'AI generation failed')
+      }
+    } catch (error: any) {
+      console.error('AI Tool Error:', error)
+      addAssistantMessage(`${t('edps.messages.aiError')} ${error.response?.data?.error || error.message}. ${t('edps.messages.createManually')}`)
+      setQuickReplies([t('common.createManually'), t('common.tryAgain'), t('common.goBack')])
+      setStep('initial')
+    }
+  }
+
   const resetForm = () => {
     setFormData({
       normNumber: '',
@@ -182,17 +282,60 @@ function EDPSFlow({ onBack }: EDPSFlowProps) {
     })
     setStep('initial')
     addAssistantMessage('Let\'s create another norm! What would you like to do?')
-    setQuickReplies(['Create new norm', 'View existing norms'])
+    setQuickReplies(['Create new norm', 'Use AI Tool 🤖', 'View existing norms'])
+  }
+
+  const handleFieldChange = (fieldName: string, value: string | number) => {
+    setFormData(prev => ({
+      ...prev,
+      [fieldName]: value
+    }))
+  }
+
+  if (step === 'review') {
+    const warningMessage = !formData.normNumber || !formData.title 
+      ? 'Você precisa preencher todos os campos em Dados Básicos antes de salvar.'
+      : undefined
+
+    return (
+      <SummaryReview
+        title={t('edps.summary.title')}
+        subtitle={t('edps.summary.subtitle')}
+        sections={[
+          {
+            title: t('edps.summary.sectionBasicData'),
+            fields: [
+              { label: t('edps.fields.normNumber'), value: formData.normNumber, fieldName: 'normNumber', placeholder: 'Ex: NP-2024-001' },
+              { label: 'Criado por', value: 'System', fieldName: 'creator', placeholder: 'Nome do criador' },
+              { label: t('edps.fields.title'), value: formData.title, fullWidth: true, fieldName: 'title', placeholder: t('edps.fields.title'), type: 'text' },
+              { label: t('edps.fields.description'), value: formData.description, fullWidth: true, fieldName: 'description', placeholder: t('edps.fields.description'), type: 'textarea' },
+              { label: t('edps.fields.target'), value: formData.target, fullWidth: true, fieldName: 'target', placeholder: t('edps.fields.target'), type: 'textarea' }
+            ]
+          }
+        ]}
+        metrics={[
+          { icon: '🧪', value: 0, label: t('summaryReview.metrics.relatedTests') },
+          { icon: '⚠️', value: 0, label: t('summaryReview.metrics.failures') },
+          { icon: '💡', value: 0, label: 'Soluções' }
+        ]}
+        statusBadge={{ label: t('common.draft'), type: 'draft' }}
+        onSave={handleSaveFromReview}
+        onEdit={handleEditFromReview}
+        onFieldChange={handleFieldChange}
+        isSaving={isSaving}
+        warningMessage={warningMessage}
+      />
+    )
   }
 
   return (
     <div className="flow-container">
       <div className="flow-header">
         <button className="back-button" onClick={onBack}>
-          ← Back to Home
+          ← {t('common.backToHome')}
         </button>
-        <h2>📋 EDPS - Engineering Design Practices</h2>
-        <p className="flow-description">Create and manage engineering norms and standards</p>
+        <h2>📋 {t('edps.title')}</h2>
+        <p className="flow-description">{t('edps.description')}</p>
       </div>
       
       <ChatInterface
@@ -201,7 +344,7 @@ function EDPSFlow({ onBack }: EDPSFlowProps) {
         onQuickReply={handleQuickReply}
         quickReplies={quickReplies}
         isProcessing={isProcessing}
-        placeholder="Type your response..."
+        placeholder={t('chat.placeholder')}
       />
     </div>
   )

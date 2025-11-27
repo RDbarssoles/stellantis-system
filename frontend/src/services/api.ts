@@ -138,6 +138,24 @@ export const exportAPI = {
   },
 }
 
+// AI Tools API
+export interface AIToolResponse {
+  success: boolean
+  data: any
+  message: string
+}
+
+export const aiToolsAPI = {
+  generateEDPS: (norma: string) => 
+    api.post<AIToolResponse>('/ai-tools/edps', { norma }),
+  generateDFMEA: (norma: string) => 
+    api.post<AIToolResponse>('/ai-tools/dfmea', { norma }),
+  generateDVP: (norma: string) => 
+    api.post<AIToolResponse>('/ai-tools/dvp', { norma }),
+  getStatus: () => 
+    api.get<{ success: boolean; configured: boolean; templates: any }>('/ai-tools/status'),
+}
+
 export default api
 
 

@@ -4,6 +4,7 @@ import EDPSFlow from './pages/EDPSFlow'
 import DVPFlow from './pages/DVPFlow'
 import DFMEAFlow from './pages/DFMEAFlow'
 import Search from './pages/Search'
+import LanguageToggle from './components/LanguageToggle'
 import './App.css'
 
 export type Page = 'home' | 'edps' | 'dvp' | 'dfmea' | 'search'
@@ -30,6 +31,7 @@ function App() {
 
   return (
     <div className="app">
+      <LanguageToggle />
       <header className="app-header">
         <div className="header-content">
           <h1>🔧 PD-SmartDoc</h1>

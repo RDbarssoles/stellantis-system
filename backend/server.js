@@ -1,9 +1,11 @@
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import { edpsRouter } from './routes/edps.js';
 import { dvpRouter } from './routes/dvp.js';
 import { dfmeaRouter } from './routes/dfmea.js';
 import { exportRouter } from './routes/export.js';
+import { aiToolsRouter } from './routes/ai-tools.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -24,6 +26,7 @@ app.use('/api/edps', edpsRouter);
 app.use('/api/dvp', dvpRouter);
 app.use('/api/dfmea', dfmeaRouter);
 app.use('/api/export', exportRouter);
+app.use('/api/ai-tools', aiToolsRouter);
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -39,7 +42,8 @@ app.get('/', (req, res) => {
       edps: '/api/edps',
       dvp: '/api/dvp',
       dfmea: '/api/dfmea',
-      export: '/api/export'
+      export: '/api/export',
+      aiTools: '/api/ai-tools'
     }
   });
 });

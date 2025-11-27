@@ -1,0 +1,28 @@
+# Environment files
+.env
+.env.local
+.env.*.local
+env.template.bak
+
+# Docker volumes
+docker-volumes/
+
+# Logs
+logs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.temp
+

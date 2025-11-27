@@ -1,0 +1,231 @@
+{
+  "common": {
+    "backToHome": "Voltar para Início",
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "edit": "Editar",
+    "create": "Criar",
+    "view": "Ver",
+    "search": "Buscar",
+    "loading": "Carregando...",
+    "retry": "Tentar novamente",
+    "confirm": "Confirmar",
+    "yes": "Sim",
+    "no": "Não",
+    "startOver": "Recomeçar",
+    "goBack": "Voltar",
+    "status": "Status",
+    "active": "Ativa",
+    "inactive": "Inativa",
+    "draft": "Rascunho",
+    "yesReviewIt": "Sim, revisar",
+    "noStartOver": "Não, recomeçar",
+    "createManually": "Criar manualmente",
+    "tryAgain": "Tentar IA novamente",
+    "empty": "(vazio)",
+    "wouldYouLikeToReview": "Gostaria de revisar e salvar",
+    "exportAsExcel": "Exportar como Excel",
+    "exportAsPDF": "Exportar como PDF",
+    "noContinue": "Não, continuar",
+    "wouldYouLikeToExport": "Gostaria de exportá-lo?",
+    "successCreatedWithId": "Sucesso! Criado com ID:",
+    "errorSaving": "Desculpe, houve um erro ao salvar. Por favor, tente novamente.",
+    "downloadingExcel": "Baixando arquivo Excel...",
+    "downloadingPDF": "Baixando arquivo PDF...",
+    "createAnother": "Criar outro",
+    "goBackToHome": "Voltar para início"
+  },
+  "home": {
+    "welcome": "Bem-vindo ao PD-SmartDoc",
+    "subtitle": "Seu assistente conversacional para gerenciamento de documentos de engenharia. Selecione um módulo abaixo para começar.",
+    "searchAction": {
+      "title": "Buscar e Navegar Documentos",
+      "description": "Visualize todos os documentos EDPS, DVP&R e DFMEA em um só lugar"
+    },
+    "modules": {
+      "edps": {
+        "title": "EDPS",
+        "fullName": "Práticas de Projeto de Engenharia",
+        "description": "Crie e gerencie normas e padrões de engenharia"
+      },
+      "dvp": {
+        "title": "DVP&R",
+        "fullName": "Plano de Validação de Projeto e Resultados",
+        "description": "Defina procedimentos de teste e critérios de validação"
+      },
+      "dfmea": {
+        "title": "DFMEA",
+        "fullName": "Análise de Modos e Efeitos de Falha de Projeto",
+        "description": "Analise modos de falha e vincule controles de prevenção/detecção"
+      }
+    },
+    "howItWorks": {
+      "title": "Como funciona",
+      "step1": {
+        "title": "Criar Normas",
+        "description": "Defina normas EDPS com procedimentos e diretrizes detalhados"
+      },
+      "step2": {
+        "title": "Definir Testes",
+        "description": "Crie procedimentos de teste DVP com critérios de aceitação"
+      },
+      "step3": {
+        "title": "Vincular no DFMEA",
+        "description": "Conecte normas e testes aos modos de falha para rastreabilidade completa"
+      }
+    }
+  },
+  "chat": {
+    "placeholder": "Digite sua resposta...",
+    "sending": "Enviando..."
+  },
+  "edps": {
+    "title": "EDPS - Práticas de Projeto de Engenharia",
+    "description": "Crie e gerencie normas e padrões de engenharia",
+    "greeting": "Olá! Posso ajudá-lo a criar uma nova norma EDPS. O que você gostaria de fazer?",
+    "quickReplies": {
+      "createNew": "Criar nova norma",
+      "useAI": "Usar Ferramenta IA 🤖",
+      "viewExisting": "Ver normas existentes"
+    },
+    "aiPrompt": "Ótimo! Vou usar a ferramenta de IA para ajudá-lo a criar uma norma EDPS. Por favor, descreva que tipo de norma você deseja criar. Seja o mais detalhado possível.\n\nPor exemplo: \"Criar uma norma para procedimento de troca de pneu incluindo etapas de segurança e ferramentas necessárias\"",
+    "fields": {
+      "normNumber": "Número da Norma",
+      "title": "Título",
+      "description": "Descrição",
+      "target": "Alvo/Objetivo",
+      "images": "Imagens"
+    },
+    "summary": {
+      "title": "Nova Norma",
+      "subtitle": "Revise todas as informações antes de salvar",
+      "sectionBasicData": "Dados Básicos",
+      "sectionImages": "Imagens Anexadas"
+    },
+    "messages": {
+      "normCreated": "✅ Sucesso! A norma foi criada com ID:",
+      "normCreatedDetail": "Gostaria de vincular esta norma a uma entrada DFMEA?",
+      "errorSaving": "❌ Desculpe, houve um erro ao salvar a norma. Por favor, tente novamente.",
+      "aiGenerating": "🤖 Gerando norma EDPS com IA... Isso pode levar um momento.",
+      "aiSuccess": "✅ A IA gerou o conteúdo!",
+      "aiSuccessDetail": "Gostaria de revisar e salvar esta norma?",
+      "aiError": "❌ Desculpe, houve um erro ao usar a ferramenta de IA:",
+      "createManually": "Você gostaria de criar a norma manualmente?",
+      "titleLabel": "Título:",
+      "descriptionLabel": "Descrição:",
+      "yesLinkToDFMEA": "Sim, vincular ao DFMEA",
+      "noCreateAnother": "Não, criar outra norma"
+    }
+  },
+  "dvp": {
+    "title": "DVP&R - Plano de Validação de Projeto e Resultados",
+    "description": "Defina procedimentos de teste e critérios de validação",
+    "greeting": "Olá! Posso ajudá-lo a criar um novo procedimento de teste DVP. O que você gostaria de fazer?",
+    "quickReplies": {
+      "createNew": "Criar novo teste",
+      "useAI": "Usar Ferramenta IA 🤖",
+      "viewExisting": "Ver testes existentes"
+    },
+    "aiPrompt": "Ótimo! Vou usar a ferramenta de IA para ajudá-lo a criar um procedimento de teste DVP. Por favor, descreva que tipo de teste você deseja criar.\n\nPor exemplo: \"Criar um teste funcional para força de extração do pneu, medindo entre 50N e 100N\"",
+    "fields": {
+      "procedureId": "ID do Procedimento",
+      "procedureType": "Tipo",
+      "testName": "Nome do Teste",
+      "objective": "Objetivo",
+      "acceptanceCriteria": "Critérios de Aceitação",
+      "responsible": "Responsável",
+      "parameterRange": "Faixa de Parâmetros"
+    },
+    "summary": {
+      "title": "Novo Teste",
+      "subtitle": "Navegue livremente entre as etapas",
+      "sectionBasicData": "Dados Básicos"
+    },
+    "messages": {
+      "testCreated": "✅ Sucesso! O procedimento de teste foi criado com ID:",
+      "testCreatedDetail": "Gostaria de vincular este teste a uma entrada DFMEA?",
+      "errorSaving": "❌ Desculpe, houve um erro ao salvar o teste. Por favor, tente novamente.",
+      "aiGenerating": "🤖 Gerando procedimento de teste DVP com IA... Isso pode levar um momento.",
+      "aiSuccess": "✅ A IA gerou o conteúdo!",
+      "aiSuccessDetail": "Gostaria de revisar e salvar este teste?",
+      "aiError": "❌ Desculpe, houve um erro ao usar a ferramenta de IA:",
+      "createManually": "Você gostaria de criar o teste manualmente?",
+      "testLabel": "Teste:",
+      "criteriaLabel": "Critérios:",
+      "yesLinkToDFMEA": "Sim, vincular ao DFMEA",
+      "noCreateAnotherTest": "Não, criar outro teste"
+    }
+  },
+  "dfmea": {
+    "title": "DFMEA - Análise de Modos e Efeitos de Falha de Projeto",
+    "description": "Analise modos de falha e vincule controles de prevenção/detecção",
+    "greeting": "Olá! Posso ajudá-lo a criar uma nova análise DFMEA. O que você gostaria de fazer?",
+    "quickReplies": {
+      "createNew": "Criar novo DFMEA",
+      "useAI": "Usar Ferramenta IA 🤖",
+      "viewExisting": "Ver análises existentes"
+    },
+    "aiPrompt": "Ótimo! Vou usar a ferramenta de IA para ajudá-lo a criar uma análise DFMEA. Por favor, descreva o cenário de falha que você deseja analisar.\n\nPor exemplo: \"Analisar falha no sistema de montagem do pneu - desprendimento do pneu durante operação\"",
+    "fields": {
+      "genericFailure": "Falha Genérica",
+      "failureMode": "Modo de Falha",
+      "cause": "Causa/Efeito",
+      "severity": "Severidade",
+      "occurrence": "Ocorrência",
+      "detection": "Detecção",
+      "rpn": "RPN"
+    },
+    "summary": {
+      "title": "Nova Análise DFMEA",
+      "subtitle": "Revise todas as informações antes de salvar",
+      "sectionBasicData": "Dados Básicos",
+      "sectionRatings": "Avaliações de Risco"
+    },
+    "messages": {
+      "dfmeaCreated": "✅ Sucesso! A análise DFMEA foi criada com ID:",
+      "errorSaving": "❌ Desculpe, houve um erro ao salvar o DFMEA. Por favor, tente novamente.",
+      "aiGenerating": "🤖 Gerando análise DFMEA com IA... Isso pode levar um momento.",
+      "aiSuccess": "✅ A IA gerou a análise!",
+      "aiSuccessDetail": "Gostaria de revisar e salvar este DFMEA?",
+      "aiError": "❌ Desculpe, houve um erro ao usar a ferramenta de IA:",
+      "createManually": "Você gostaria de criar a análise manualmente?",
+      "genericFailureLabel": "Falha Genérica:",
+      "failureModeLabel": "Modo de Falha:",
+      "causeLabel": "Causa:",
+      "rpnLabel": "RPN:"
+    }
+  },
+  "search": {
+    "title": "🔍 Buscar Documentos",
+    "description": "Busque e navegue por todos os documentos de engenharia",
+    "placeholder": "Buscar normas por número ou título...",
+    "filters": {
+      "all": "Todas",
+      "edps": "EDPS",
+      "dvp": "DVP&R",
+      "dfmea": "DFMEA"
+    },
+    "results": "Resultados",
+    "noResults": {
+      "title": "Nenhum documento encontrado",
+      "description": "Tente ajustar sua consulta de busca ou filtros"
+    },
+    "loading": "Carregando documentos...",
+    "createdBy": "Criado por:",
+    "creationDate": "Data de criação:",
+    "lastEdited": "Última edição:"
+  },
+  "summaryReview": {
+    "title": "Revisão Final",
+    "subtitle": "Confira todas as informações antes de salvar",
+    "save": "💾 Salvar",
+    "warningTitle": "Campos obrigatórios não preenchidos",
+    "status": "Status",
+    "metrics": {
+      "relatedTests": "Testes Relacionados",
+      "norms": "Normas",
+      "failures": "Falhas"
+    }
+  }
+}
+

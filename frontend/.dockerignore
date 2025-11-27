@@ -1,0 +1,45 @@
+# Dependencies
+node_modules
+npm-debug.log
+package-lock.json
+
+# Build output
+dist
+build
+.vite
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Git
+.git
+.gitignore
+
+# Documentation
+*.md
+README*
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+coverage
+.nyc_output
+
+# Logs
+logs
+*.log
+
+# Development files
+tsconfig.tsbuildinfo
+

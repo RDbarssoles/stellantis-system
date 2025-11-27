@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { edpsAPI, dvpAPI, dfmeaAPI, EDPS, DVP, DFMEA } from '../services/api'
+import { useLanguage } from '../contexts/LanguageContext'
 import './Search.css'
 
 interface SearchProps {
@@ -22,6 +23,7 @@ interface SearchResult {
 }
 
 function Search({ onBack }: SearchProps) {
+  const { t } = useLanguage()
   const [searchQuery, setSearchQuery] = useState('')
   const [filter, setFilter] = useState<DocumentType>('all')
   const [results, setResults] = useState<SearchResult[]>([])
@@ -145,10 +147,10 @@ function Search({ onBack }: SearchProps) {
     <div className="search-container">
       <div className="search-header">
         <button className="back-button" onClick={onBack}>
-          ← Back to Home
+          ← {t('common.backToHome')}
         </button>
-        <h2>🔍 Search Documents</h2>
-        <p className="search-description">Search and browse all engineering documents</p>
+        <h2>{t('search.title')}</h2>
+        <p className="search-description">{t('search.description')}</p>
       </div>
 
       <div className="search-controls">
@@ -157,7 +159,7 @@ function Search({ onBack }: SearchProps) {
           <input
             type="text"
             className="search-input"
-            placeholder="Buscar normas por número ou título..."
+            placeholder={t('search.placeholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -169,10 +171,10 @@ function Search({ onBack }: SearchProps) {
             onChange={(e) => setFilter(e.target.value as DocumentType)}
             className="filter-select"
           >
-            <option value="all">Todas</option>
-            <option value="edps">EDPS</option>
-            <option value="dvp">DVP&R</option>
-            <option value="dfmea">DFMEA</option>
+            <option value="all">{t('search.filters.all')}</option>
+            <option value="edps">{t('search.filters.edps')}</option>
+            <option value="dvp">{t('search.filters.dvp')}</option>
+            <option value="dfmea">{t('search.filters.dfmea')}</option>
           </select>
         </div>
       </div>
@@ -207,18 +209,18 @@ function Search({ onBack }: SearchProps) {
         {isLoading ? (
           <div className="loading-state">
             <div className="spinner"></div>
-            <p>Loading documents...</p>
+            <p>{t('search.loading')}</p>
           </div>
         ) : filteredResults.length === 0 ? (
           <div className="empty-state">
             <div className="empty-icon">📭</div>
-            <h3>No documents found</h3>
-            <p>Try adjusting your search query or filters</p>
+            <h3>{t('search.noResults.title')}</h3>
+            <p>{t('search.noResults.description')}</p>
           </div>
         ) : (
           <div className="results-list">
             <div className="results-header">
-              <h3>Results ({filteredResults.length})</h3>
+              <h3>{t('search.results')} ({filteredResults.length})</h3>
             </div>
             {filteredResults.map((result) => (
               <div key={result.id} className="result-card">
@@ -232,7 +234,7 @@ function Search({ onBack }: SearchProps) {
                   <div className="result-id">{result.subtitle}</div>
                   <div className={`result-status status-${result.status}`}>
                     <span className="status-indicator"></span>
-                    {result.status === 'active' ? 'Ativa' : result.status}
+                    {result.status === 'active' ? t('common.active') : result.status}
                   </div>
                   <button className="result-menu-btn">⋮</button>
                 </div>
@@ -243,13 +245,13 @@ function Search({ onBack }: SearchProps) {
                 <div className="result-footer">
                   <div className="result-meta">
                     <span className="meta-item">
-                      <strong>Criado por:</strong> {result.createdBy}
+                      <strong>{t('search.createdBy')}</strong> {result.createdBy}
                     </span>
                     <span className="meta-item">
-                      <strong>Data de criação:</strong> {formatDate(result.createdAt)}
+                      <strong>{t('search.creationDate')}</strong> {formatDate(result.createdAt)}
                     </span>
                     <span className="meta-item">
-                      <strong>Última edição:</strong> {formatDate(result.updatedAt)}
+                      <strong>{t('search.lastEdited')}</strong> {formatDate(result.updatedAt)}
                     </span>
                   </div>
                 </div>
