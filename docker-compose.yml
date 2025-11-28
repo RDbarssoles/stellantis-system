@@ -11,6 +11,7 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3001
+      - SAI_API_KEY=${SAI_API_KEY}
     volumes:
       # Persist JSON data files
       - backend-data:/app/data

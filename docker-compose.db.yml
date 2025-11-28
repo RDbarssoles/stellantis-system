@@ -43,6 +43,7 @@ services:
       - DB_NAME=pdsmartdoc
       - DB_USER=pduser
       - DB_PASSWORD=${DB_PASSWORD:-pdpassword123}
+      - SAI_API_KEY=${SAI_API_KEY}
     depends_on:
       postgres:
         condition: service_healthy

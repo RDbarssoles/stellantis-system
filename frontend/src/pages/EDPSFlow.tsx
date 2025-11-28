@@ -79,10 +79,8 @@ function EDPSFlow({ onBack }: EDPSFlowProps) {
   const processStep = (userInput: string) => {
     switch (step) {
       case 'initial':
-        if (userInput.toLowerCase().includes('ai') || userInput.toLowerCase().includes('🤖') || userInput.toLowerCase().includes('ia')) {
-          addAssistantMessage(t('edps.aiPrompt'))
-          setStep('aiInput')
-        } else if (userInput.toLowerCase().includes('create') || userInput.toLowerCase().includes('new') || userInput.toLowerCase().includes('criar')) {
+        // Check for create/criar first (before AI check, since "criar" contains "ia")
+        if (userInput.toLowerCase().includes('create') || userInput.toLowerCase().includes('new') || userInput.toLowerCase().includes('criar') || userInput.toLowerCase().includes('nova norma') || userInput.toLowerCase().includes('manualmente')) {
           const suggestedNumber = Math.floor(10000 + Math.random() * 90000).toString()
           setFormData(prev => ({ 
             ...prev, 
@@ -95,6 +93,10 @@ function EDPSFlow({ onBack }: EDPSFlowProps) {
           }))
           // Go directly to review screen with blank fields
           setStep('review')
+        } else if (userInput.toLowerCase().includes('ferramenta') || userInput.toLowerCase().includes('🤖') || userInput.toLowerCase().match(/\b(ai|ia)\b/)) {
+          // Use word boundary regex to match "AI" or "IA" as separate words, not inside "criar"
+          addAssistantMessage(t('edps.aiPrompt'))
+          setStep('aiInput')
         } else if (userInput.toLowerCase().includes('view') || userInput.toLowerCase().includes('existing') || userInput.toLowerCase().includes('ver')) {
           addAssistantMessage('Fetching existing norms...')
           fetchExistingNorms()
