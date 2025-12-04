@@ -93,10 +93,12 @@
 
 .car-parts-filter-section {
   margin-bottom: 40px;
+  margin-top: 40px;
   background: var(--surface-color);
   padding: 30px;
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-sm);
+  border-top: 3px solid var(--primary-color);
 }
 
 .car-parts-title {

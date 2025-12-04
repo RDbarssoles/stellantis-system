@@ -7,30 +7,44 @@ import './Flow.css'
 
 interface EDPSFlowProps {
   onBack: () => void
+  initialData?: { mode: 'view' | 'edit', data: any, id?: string }
 }
 
 type Step = 'initial' | 'aiInput' | 'number' | 'title' | 'description' | 'target' | 'images' | 'confirm' | 'review' | 'complete'
 
-function EDPSFlow({ onBack }: EDPSFlowProps) {
+function EDPSFlow({ onBack, initialData }: EDPSFlowProps) {
   const { t } = useLanguage()
   const [messages, setMessages] = useState<Message[]>([])
-  const [step, setStep] = useState<Step>('initial')
+  const [step, setStep] = useState<Step>(initialData ? 'review' : 'initial')
   const [isProcessing, setIsProcessing] = useState(false)
   const [quickReplies, setQuickReplies] = useState<string[]>([])
   const [isSaving, setIsSaving] = useState(false)
+  const [isViewMode, setIsViewMode] = useState(initialData?.mode === 'view')
   const hasInitialized = useRef(false)
   
-  const [formData, setFormData] = useState<CreateEDPSData>({
-    normNumber: '',
-    title: '',
-    description: '',
-    target: '',
-    carPart: '',
-    images: []
+  const [formData, setFormData] = useState<CreateEDPSData>(() => {
+    if (initialData?.data) {
+      return {
+        normNumber: initialData.data.normNumber || '',
+        title: initialData.data.title || '',
+        description: initialData.data.description || '',
+        target: initialData.data.target || '',
+        carPart: initialData.data.carPart || '',
+        images: initialData.data.images || []
+      }
+    }
+    return {
+      normNumber: '',
+      title: '',
+      description: '',
+      target: '',
+      carPart: '',
+      images: []
+    }
   })
 
   useEffect(() => {
-    if (!hasInitialized.current) {
+    if (!hasInitialized.current && !initialData) {
       hasInitialized.current = true
       addAssistantMessage(t('edps.greeting'))
       setQuickReplies([
@@ -39,7 +53,7 @@ function EDPSFlow({ onBack }: EDPSFlowProps) {
         t('edps.quickReplies.viewExisting')
       ])
     }
-  }, [t])
+  }, [t, initialData])
 
   const addAssistantMessage = (content: string) => {
     const message: Message = {
@@ -189,8 +203,24 @@ function EDPSFlow({ onBack }: EDPSFlowProps) {
   }
 
   const handleEditFromReview = () => {
-    // Go back to home
-    onBack()
+    // Switch to edit mode
+    setIsViewMode(false)
+  }
+
+  const handleDeleteFromReview = async () => {
+    const confirmed = window.confirm(t('common.deleteConfirm'))
+    if (!confirmed) return
+
+    try {
+      if (initialData?.data?.id) {
+        await edpsAPI.delete(initialData.data.id)
+        alert(t('common.deleteSuccess'))
+        onBack()
+      }
+    } catch (error) {
+      console.error('Error deleting norm:', error)
+      alert(t('common.deleteError'))
+    }
   }
 
   const fetchExistingNorms = async () => {
@@ -339,8 +369,9 @@ function EDPSFlow({ onBack }: EDPSFlowProps) {
 
     return (
       <SummaryReview
-        title={t('edps.summary.title')}
+        title={isViewMode && formData.title ? formData.title : t('edps.summary.title')}
         subtitle={t('edps.summary.subtitle')}
+        onBack={onBack}
         sections={[
           {
             title: t('edps.summary.sectionBasicData'),
@@ -368,6 +399,7 @@ function EDPSFlow({ onBack }: EDPSFlowProps) {
         statusBadge={{ label: t('common.draft'), type: 'draft' }}
         onSave={handleSaveFromReview}
         onEdit={handleEditFromReview}
+        onDelete={isViewMode ? handleDeleteFromReview : undefined}
         onFieldChange={(fieldName, value) => {
           if (fieldName === 'images') {
             handleImagesChange(fieldName, value as string[])
@@ -377,6 +409,7 @@ function EDPSFlow({ onBack }: EDPSFlowProps) {
         }}
         isSaving={isSaving}
         warningMessage={warningMessage}
+        readOnly={isViewMode}
       />
     )
   }

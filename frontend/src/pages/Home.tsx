@@ -184,23 +184,6 @@ function Home({ onNavigate }: HomeProps) {
         </button>
       </div>
 
-      <div className="car-parts-filter-section">
-        <h3 className="car-parts-title">🚗 {t('home.carPartsFilter.title')}</h3>
-        <p className="car-parts-subtitle">{t('home.carPartsFilter.subtitle')}</p>
-        <div className="car-parts-grid">
-          {carPartOptions.map((part) => (
-            <button
-              key={part.value}
-              className="car-part-button"
-              onClick={() => handleCarPartSelect(part.value)}
-            >
-              <span className="car-part-icon">{part.icon}</span>
-              <span className="car-part-label">{part.label}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-
       <div className="modules-grid">
         {modules.map((module) => (
           <button
@@ -236,6 +219,23 @@ function Home({ onNavigate }: HomeProps) {
             <h4>{t('home.howItWorks.step3.title')}</h4>
             <p>{t('home.howItWorks.step3.description')}</p>
           </div>
+        </div>
+      </div>
+
+      <div className="car-parts-filter-section">
+        <h3 className="car-parts-title">🚗 {t('home.carPartsFilter.title')}</h3>
+        <p className="car-parts-subtitle">{t('home.carPartsFilter.subtitle')}</p>
+        <div className="car-parts-grid">
+          {carPartOptions.map((part) => (
+            <button
+              key={part.value}
+              className="car-part-button"
+              onClick={() => handleCarPartSelect(part.value)}
+            >
+              <span className="car-part-icon">{part.icon}</span>
+              <span className="car-part-label">{part.label}</span>
+            </button>
+          ))}
         </div>
       </div>
 

@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { edpsAPI, dvpAPI, dfmeaAPI, EDPS, DVP, DFMEA } from '../services/api'
 import { useLanguage } from '../contexts/LanguageContext'
+import { Page } from '../App'
 import './Search.css'
 
 interface SearchProps {
   onBack: () => void
+  onNavigate: (page: Page, data?: any) => void
   initialCarPart?: string
 }
 
@@ -23,7 +25,7 @@ interface SearchResult {
   data: EDPS | DVP | DFMEA
 }
 
-function Search({ onBack, initialCarPart }: SearchProps) {
+function Search({ onBack, onNavigate, initialCarPart }: SearchProps) {
   const { t } = useLanguage()
   const [searchQuery, setSearchQuery] = useState('')
   const [filter, setFilter] = useState<DocumentType>('all')
@@ -31,6 +33,8 @@ function Search({ onBack, initialCarPart }: SearchProps) {
   const [results, setResults] = useState<SearchResult[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [counts, setCounts] = useState({ edps: 0, dvp: 0, dfmea: 0 })
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     loadAllDocuments()
@@ -41,6 +45,23 @@ function Search({ onBack, initialCarPart }: SearchProps) {
       setCarPartFilter(initialCarPart)
     }
   }, [initialCarPart])
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setOpenMenuId(null)
+      }
+    }
+
+    if (openMenuId) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [openMenuId])
 
   const loadAllDocuments = async () => {
     setIsLoading(true)
@@ -91,6 +112,14 @@ function Search({ onBack, initialCarPart }: SearchProps) {
       }))
 
       const allResults = [...edpsResults, ...dvpResults, ...dfmeaResults]
+      
+      // Sort by creation date - newest first
+      allResults.sort((a, b) => {
+        const dateA = new Date(a.createdAt).getTime()
+        const dateB = new Date(b.createdAt).getTime()
+        return dateB - dateA
+      })
+      
       setResults(allResults)
       setCounts({
         edps: edpsResults.length,
@@ -153,6 +182,53 @@ function Search({ onBack, initialCarPart }: SearchProps) {
       month: '2-digit', 
       year: 'numeric' 
     })
+  }
+
+  const handleToggleMenu = (resultId: string) => {
+    setOpenMenuId(openMenuId === resultId ? null : resultId)
+  }
+
+  const handleView = (result: SearchResult) => {
+    // Navigate to the appropriate flow with view mode
+    onNavigate(result.type, { mode: 'view', data: result.data })
+    setOpenMenuId(null)
+  }
+
+  const handleEdit = (result: SearchResult) => {
+    // Navigate to the appropriate flow with edit mode
+    onNavigate(result.type, { mode: 'edit', data: result.data })
+    setOpenMenuId(null)
+  }
+
+  const handleDelete = async (result: SearchResult) => {
+    const confirmed = window.confirm(t('common.deleteConfirm'))
+    if (!confirmed) {
+      setOpenMenuId(null)
+      return
+    }
+
+    try {
+      switch (result.type) {
+        case 'edps':
+          await edpsAPI.delete(result.id)
+          break
+        case 'dvp':
+          await dvpAPI.delete(result.id)
+          break
+        case 'dfmea':
+          await dfmeaAPI.delete(result.id)
+          break
+      }
+      
+      // Reload documents after deletion
+      await loadAllDocuments()
+      alert(t('common.deleteSuccess'))
+    } catch (error) {
+      console.error('Error deleting document:', error)
+      alert(t('common.deleteError'))
+    } finally {
+      setOpenMenuId(null)
+    }
   }
 
   return (
@@ -273,7 +349,39 @@ function Search({ onBack, initialCarPart }: SearchProps) {
                     <span className="status-indicator"></span>
                     {result.status === 'active' ? t('common.active') : result.status}
                   </div>
-                  <button className="result-menu-btn">⋮</button>
+                  <div className="result-menu-container">
+                    <button 
+                      className="result-menu-btn"
+                      onClick={() => handleToggleMenu(result.id)}
+                    >
+                      ⋮
+                    </button>
+                    {openMenuId === result.id && (
+                      <div className="result-dropdown-menu" ref={menuRef}>
+                        <button 
+                          className="dropdown-menu-item"
+                          onClick={() => handleView(result)}
+                        >
+                          <span className="menu-icon">👁️</span>
+                          {t('common.view')}
+                        </button>
+                        <button 
+                          className="dropdown-menu-item"
+                          onClick={() => handleEdit(result)}
+                        >
+                          <span className="menu-icon">✏️</span>
+                          {t('common.edit')}
+                        </button>
+                        <button 
+                          className="dropdown-menu-item delete-item"
+                          onClick={() => handleDelete(result)}
+                        >
+                          <span className="menu-icon">🗑️</span>
+                          {t('common.delete')}
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <h3 className="result-title">{result.title}</h3>

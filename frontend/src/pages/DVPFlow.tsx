@@ -7,32 +7,48 @@ import './Flow.css'
 
 interface DVPFlowProps {
   onBack: () => void
+  initialData?: { mode: 'view' | 'edit', data: any, id?: string }
 }
 
 type Step = 'initial' | 'aiInput' | 'procedureType' | 'objective' | 'testName' | 'acceptanceCriteria' | 'responsible' | 'parameterRange' | 'confirm' | 'review' | 'complete'
 
-function DVPFlow({ onBack }: DVPFlowProps) {
+function DVPFlow({ onBack, initialData }: DVPFlowProps) {
   const { t } = useLanguage()
   const [messages, setMessages] = useState<Message[]>([])
-  const [step, setStep] = useState<Step>('initial')
+  const [step, setStep] = useState<Step>(initialData ? 'review' : 'initial')
   const [isProcessing, setIsProcessing] = useState(false)
   const [quickReplies, setQuickReplies] = useState<string[]>([])
   const [isSaving, setIsSaving] = useState(false)
+  const [isViewMode, setIsViewMode] = useState(initialData?.mode === 'view')
   const hasInitialized = useRef(false)
   
-  const [formData, setFormData] = useState<CreateDVPData>({
-    procedureId: '',
-    procedureType: 'FUNCIONAL',
-    performanceObjective: '',
-    testName: '',
-    acceptanceCriteria: '',
-    responsible: '',
-    parameterRange: '',
-    carPart: ''
+  const [formData, setFormData] = useState<CreateDVPData>(() => {
+    if (initialData?.data) {
+      return {
+        procedureId: initialData.data.procedureId || '',
+        procedureType: initialData.data.procedureType || 'FUNCIONAL',
+        performanceObjective: initialData.data.performanceObjective || '',
+        testName: initialData.data.testName || '',
+        acceptanceCriteria: initialData.data.acceptanceCriteria || '',
+        responsible: initialData.data.responsible || '',
+        parameterRange: initialData.data.parameterRange || '',
+        carPart: initialData.data.carPart || ''
+      }
+    }
+    return {
+      procedureId: '',
+      procedureType: 'FUNCIONAL',
+      performanceObjective: '',
+      testName: '',
+      acceptanceCriteria: '',
+      responsible: '',
+      parameterRange: '',
+      carPart: ''
+    }
   })
 
   useEffect(() => {
-    if (!hasInitialized.current) {
+    if (!hasInitialized.current && !initialData) {
       hasInitialized.current = true
       addAssistantMessage(t('dvp.greeting'))
       setQuickReplies([
@@ -41,7 +57,7 @@ function DVPFlow({ onBack }: DVPFlowProps) {
         t('dvp.quickReplies.viewExisting')
       ])
     }
-  }, [t])
+  }, [t, initialData])
 
   const addAssistantMessage = (content: string) => {
     const message: Message = {
@@ -199,8 +215,24 @@ function DVPFlow({ onBack }: DVPFlowProps) {
   }
 
   const handleEditFromReview = () => {
-    // Go back to home
-    onBack()
+    // Switch to edit mode
+    setIsViewMode(false)
+  }
+
+  const handleDeleteFromReview = async () => {
+    const confirmed = window.confirm(t('common.deleteConfirm'))
+    if (!confirmed) return
+
+    try {
+      if (initialData?.data?.id) {
+        await dvpAPI.delete(initialData.data.id)
+        alert(t('common.deleteSuccess'))
+        onBack()
+      }
+    } catch (error) {
+      console.error('Error deleting test:', error)
+      alert(t('common.deleteError'))
+    }
   }
 
   const fetchExistingTests = async () => {
@@ -364,8 +396,9 @@ function DVPFlow({ onBack }: DVPFlowProps) {
 
     return (
       <SummaryReview
-        title={t('dvp.summary.title')}
+        title={isViewMode && formData.testName ? formData.testName : t('dvp.summary.title')}
         subtitle={t('dvp.summary.subtitle')}
+        onBack={onBack}
         sections={[
           {
             title: t('dvp.summary.sectionBasicData'),
@@ -390,9 +423,11 @@ function DVPFlow({ onBack }: DVPFlowProps) {
         statusBadge={{ label: t('common.draft'), type: 'draft' }}
         onSave={handleSaveFromReview}
         onEdit={handleEditFromReview}
+        onDelete={isViewMode ? handleDeleteFromReview : undefined}
         onFieldChange={handleFieldChange}
         isSaving={isSaving}
         warningMessage={warningMessage}
+        readOnly={isViewMode}
       />
     )
   }

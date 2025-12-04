@@ -80,6 +80,53 @@
   opacity: 0.6;
 }
 
+.summary-edit-btn {
+  padding: 12px 24px;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.summary-edit-btn:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.summary-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.summary-delete-btn {
+  padding: 12px 24px;
+  background: #d32f2f;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.summary-delete-btn:hover {
+  background: #b71c1c;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
 .summary-content {
   background: var(--surface-color);
   border-radius: var(--border-radius);

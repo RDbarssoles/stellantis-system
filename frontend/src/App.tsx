@@ -15,13 +15,25 @@ function App() {
   const { isAuthenticated, logout, user } = useAuth()
   const [currentPage, setCurrentPage] = useState<Page>('home')
   const [searchCarPart, setSearchCarPart] = useState<string | undefined>()
+  const [pageData, setPageData] = useState<any>(null)
 
-  const handleNavigate = (page: Page, carPart?: string) => {
+  const handleNavigate = (page: Page, param?: string | any) => {
     setCurrentPage(page)
-    if (page === 'search' && carPart) {
-      setSearchCarPart(carPart)
-    } else {
+    
+    // Handle search with car part filter
+    if (page === 'search' && typeof param === 'string') {
+      setSearchCarPart(param)
+      setPageData(null)
+    }
+    // Handle navigation with data (view/edit mode)
+    else if (param && typeof param === 'object') {
+      setPageData(param)
       setSearchCarPart(undefined)
+    } 
+    // Default navigation
+    else {
+      setSearchCarPart(undefined)
+      setPageData(null)
     }
   }
 
@@ -40,13 +52,13 @@ function App() {
       case 'home':
         return <Home onNavigate={handleNavigate} />
       case 'edps':
-        return <EDPSFlow onBack={() => handleNavigate('home')} />
+        return <EDPSFlow onBack={() => handleNavigate('home')} initialData={pageData} />
       case 'dvp':
-        return <DVPFlow onBack={() => handleNavigate('home')} />
+        return <DVPFlow onBack={() => handleNavigate('home')} initialData={pageData} />
       case 'dfmea':
-        return <DFMEAFlow onBack={() => handleNavigate('home')} />
+        return <DFMEAFlow onBack={() => handleNavigate('home')} initialData={pageData} />
       case 'search':
-        return <Search onBack={() => handleNavigate('home')} initialCarPart={searchCarPart} />
+        return <Search onBack={() => handleNavigate('home')} onNavigate={handleNavigate} initialCarPart={searchCarPart} />
       default:
         return <Home onNavigate={handleNavigate} />
     }

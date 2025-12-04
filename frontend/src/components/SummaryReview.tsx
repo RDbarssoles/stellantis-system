@@ -30,6 +30,8 @@ interface SummaryReviewProps {
   metrics?: SummaryMetric[]
   onSave: () => void
   onEdit: () => void
+  onBack?: () => void
+  onDelete?: () => void
   onFieldChange?: (fieldName: string, value: string | number | string[]) => void
   isSaving?: boolean
   warningMessage?: string
@@ -37,6 +39,7 @@ interface SummaryReviewProps {
     label: string
     type: 'draft' | 'active' | 'inactive'
   }
+  readOnly?: boolean
 }
 
 function SummaryReview({
@@ -46,10 +49,13 @@ function SummaryReview({
   metrics = [],
   onSave,
   onEdit,
+  onBack,
+  onDelete,
   onFieldChange,
   isSaving = false,
   warningMessage,
-  statusBadge
+  statusBadge,
+  readOnly = false
 }: SummaryReviewProps) {
   const { t } = useLanguage()
   
@@ -86,20 +92,39 @@ function SummaryReview({
   return (
     <div className="summary-review">
       <div className="summary-header">
-        <button className="summary-back-btn" onClick={onEdit}>
+        <button className="summary-back-btn" onClick={onBack || onEdit}>
           ← 
         </button>
         <div className="summary-title-section">
           <h1 className="summary-main-title">{title}</h1>
           <p className="summary-subtitle">{defaultSubtitle}</p>
         </div>
-        <button 
-          className="summary-save-btn" 
-          onClick={onSave}
-          disabled={isSaving || !!warningMessage}
-        >
-          {t('summaryReview.save')}
-        </button>
+        {readOnly ? (
+          <div className="summary-actions">
+            <button 
+              className="summary-edit-btn" 
+              onClick={onEdit}
+            >
+              ✏️ {t('common.edit')}
+            </button>
+            {onDelete && (
+              <button 
+                className="summary-delete-btn" 
+                onClick={onDelete}
+              >
+                🗑️ {t('common.delete')}
+              </button>
+            )}
+          </div>
+        ) : (
+          <button 
+            className="summary-save-btn" 
+            onClick={onSave}
+            disabled={isSaving || !!warningMessage}
+          >
+            {t('summaryReview.save')}
+          </button>
+        )}
       </div>
 
       <div className="summary-content">
@@ -125,12 +150,15 @@ function SummaryReview({
                       onChange={(e) => handleFieldChange(field.fieldName, e.target.value)}
                       placeholder={field.placeholder || field.label}
                       rows={4}
+                      readOnly={readOnly || field.readonly}
+                      disabled={readOnly || field.readonly}
                     />
                   ) : field.type === 'select' ? (
                     <select
                       className="summary-field-input"
                       value={field.value || ''}
                       onChange={(e) => handleFieldChange(field.fieldName, e.target.value)}
+                      disabled={readOnly || field.readonly}
                     >
                       <option value="">{field.placeholder || `Select ${field.label}`}</option>
                       {field.options?.map((option) => (
@@ -141,28 +169,34 @@ function SummaryReview({
                     </select>
                   ) : field.type === 'image-upload' ? (
                     <div className="summary-image-upload">
-                      <input
-                        type="file"
-                        id={`image-upload-${fieldIndex}`}
-                        className="summary-image-input"
-                        accept="image/*"
-                        multiple
-                        onChange={(e) => handleImageUpload(field.fieldName, (field.value as string[]) || [], e)}
-                      />
-                      <label htmlFor={`image-upload-${fieldIndex}`} className="summary-image-upload-btn">
-                        📷 {t('summaryReview.uploadImages')}
-                      </label>
+                      {!readOnly && (
+                        <>
+                          <input
+                            type="file"
+                            id={`image-upload-${fieldIndex}`}
+                            className="summary-image-input"
+                            accept="image/*"
+                            multiple
+                            onChange={(e) => handleImageUpload(field.fieldName, (field.value as string[]) || [], e)}
+                          />
+                          <label htmlFor={`image-upload-${fieldIndex}`} className="summary-image-upload-btn">
+                            📷 {t('summaryReview.uploadImages')}
+                          </label>
+                        </>
+                      )}
                       <div className="summary-image-preview-container">
                         {((field.value as string[]) || []).map((image, imgIndex) => (
                           <div key={imgIndex} className="summary-image-preview">
                             <img src={image} alt={`Preview ${imgIndex + 1}`} />
-                            <button
-                              type="button"
-                              className="summary-image-remove"
-                              onClick={() => handleImageRemove(field.fieldName, (field.value as string[]) || [], imgIndex)}
-                            >
-                              ✕
-                            </button>
+                            {!readOnly && (
+                              <button
+                                type="button"
+                                className="summary-image-remove"
+                                onClick={() => handleImageRemove(field.fieldName, (field.value as string[]) || [], imgIndex)}
+                              >
+                                ✕
+                              </button>
+                            )}
                           </div>
                         ))}
                       </div>
@@ -170,12 +204,12 @@ function SummaryReview({
                   ) : (
                     <input
                       type={field.type || 'text'}
-                      className={`summary-field-input ${field.readonly ? 'readonly' : ''}`}
+                      className={`summary-field-input ${(readOnly || field.readonly) ? 'readonly' : ''}`}
                       value={field.value || ''}
                       onChange={(e) => handleFieldChange(field.fieldName, e.target.value)}
                       placeholder={field.placeholder || field.label}
-                      readOnly={field.readonly}
-                      disabled={field.readonly}
+                      readOnly={readOnly || field.readonly}
+                      disabled={readOnly || field.readonly}
                     />
                   )}
                 </div>

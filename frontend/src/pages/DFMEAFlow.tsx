@@ -7,34 +7,51 @@ import './Flow.css'
 
 interface DFMEAFlowProps {
   onBack: () => void
+  initialData?: { mode: 'view' | 'edit', data: any, id?: string }
 }
 
 type Step = 'initial' | 'aiInput' | 'genericFailure' | 'failureMode' | 'cause' | 'prevention' | 'selectEdps' | 'detection' | 'selectDvp' | 'ratings' | 'confirm' | 'review' | 'export' | 'complete'
 
-function DFMEAFlow({ onBack }: DFMEAFlowProps) {
+function DFMEAFlow({ onBack, initialData }: DFMEAFlowProps) {
   const { t } = useLanguage()
   const [messages, setMessages] = useState<Message[]>([])
-  const [step, setStep] = useState<Step>('initial')
+  const [step, setStep] = useState<Step>(initialData ? 'review' : 'initial')
   const [isProcessing, setIsProcessing] = useState(false)
   const [quickReplies, setQuickReplies] = useState<string[]>([])
   const [availableEdps, setAvailableEdps] = useState<EDPS[]>([])
   const [availableDvp, setAvailableDvp] = useState<DVP[]>([])
   const [createdDfmeaId, setCreatedDfmeaId] = useState<string>('')
   const [isSaving, setIsSaving] = useState(false)
+  const [isViewMode, setIsViewMode] = useState(initialData?.mode === 'view')
   const hasInitialized = useRef(false)
   
-  const [formData, setFormData] = useState<CreateDFMEAData>({
-    genericFailure: '',
-    failureMode: '',
-    cause: '',
-    carPart: '',
-    severity: 5,
-    occurrence: 5,
-    detection: 5
+  const [formData, setFormData] = useState<CreateDFMEAData>(() => {
+    if (initialData?.data) {
+      return {
+        genericFailure: initialData.data.genericFailure || '',
+        failureMode: initialData.data.failureMode || '',
+        cause: initialData.data.cause || '',
+        carPart: initialData.data.carPart || '',
+        severity: initialData.data.severity || 5,
+        occurrence: initialData.data.occurrence || 5,
+        detection: initialData.data.detection || 5,
+        edpsId: initialData.data.edpsId,
+        dvpId: initialData.data.dvpId
+      }
+    }
+    return {
+      genericFailure: '',
+      failureMode: '',
+      cause: '',
+      carPart: '',
+      severity: 5,
+      occurrence: 5,
+      detection: 5
+    }
   })
 
   useEffect(() => {
-    if (!hasInitialized.current) {
+    if (!hasInitialized.current && !initialData) {
       hasInitialized.current = true
       addAssistantMessage(t('dfmea.greeting'))
       setQuickReplies([
@@ -43,7 +60,7 @@ function DFMEAFlow({ onBack }: DFMEAFlowProps) {
         t('dfmea.quickReplies.viewExisting')
       ])
     }
-  }, [t])
+  }, [t, initialData])
 
   const addAssistantMessage = (content: string) => {
     const message: Message = {
@@ -332,8 +349,24 @@ function DFMEAFlow({ onBack }: DFMEAFlowProps) {
   }
 
   const handleEditFromReview = () => {
-    // Go back to home
-    onBack()
+    // Switch to edit mode
+    setIsViewMode(false)
+  }
+
+  const handleDeleteFromReview = async () => {
+    const confirmed = window.confirm(t('common.deleteConfirm'))
+    if (!confirmed) return
+
+    try {
+      if (initialData?.data?.id) {
+        await dfmeaAPI.delete(initialData.data.id)
+        alert(t('common.deleteSuccess'))
+        onBack()
+      }
+    } catch (error) {
+      console.error('Error deleting DFMEA:', error)
+      alert(t('common.deleteError'))
+    }
   }
 
   const fetchExistingDFMEA = async () => {
@@ -504,8 +537,9 @@ function DFMEAFlow({ onBack }: DFMEAFlowProps) {
 
     return (
       <SummaryReview
-        title={t('dfmea.summary.title')}
+        title={isViewMode && formData.genericFailure ? formData.genericFailure : t('dfmea.summary.title')}
         subtitle={t('dfmea.summary.subtitle')}
+        onBack={onBack}
         sections={[
           {
             title: t('dfmea.summary.sectionBasicData'),
@@ -542,9 +576,11 @@ function DFMEAFlow({ onBack }: DFMEAFlowProps) {
         statusBadge={{ label: t('common.draft'), type: 'draft' }}
         onSave={handleSaveFromReview}
         onEdit={handleEditFromReview}
+        onDelete={isViewMode ? handleDeleteFromReview : undefined}
         onFieldChange={handleFieldChange}
         isSaving={isSaving}
         warningMessage={warningMessage}
+        readOnly={isViewMode}
       />
     )
   }
